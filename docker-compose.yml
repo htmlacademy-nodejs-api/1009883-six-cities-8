@@ -1,8 +1,8 @@
 services:
   node:
-    image: "node:20"
+    image: 'node:20'
     container_name: six-cities-node
-    user: "node"
+    user: 'node'
     working_dir: /home/node/app
     stdin_open: true
     tty: true
