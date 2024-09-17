@@ -8,3 +8,5 @@ services:
     tty: true
     volumes:
       - ./:/home/node/app
+    ports:
+      - 127.0.0.1:3123:3123
