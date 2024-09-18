@@ -1,0 +1,65 @@
+{
+  "api": {
+    "titles": [
+      "Hotel California",
+      "House Of The Rising Sun",
+      "Cabin in the woods",
+      "Hogwarts Castle",
+      "Death Star"
+    ],
+    "descriptions": [
+      "Such a lovely place",
+      "The ruin of many a poor boy",
+      "Wooden cabin in the middle of a dark forest",
+      "Magical medieval castle",
+      "Interstellar Superweapon"
+    ],
+    "cities": [
+      "Paris",
+      "Cologne",
+      "Brussels",
+      "Amsterdam",
+      "Hamburg",
+      "Dusseldorf"
+    ],
+    "previews": [
+      "hotel.jpg",
+      "apartement.png",
+      "house.gif",
+      "room.jpg",
+      "my-preview.jpg"
+    ],
+    "photos": [
+      "photo1.jpg",
+      "photo2.jpg",
+      "photo3.jpg",
+      "photo4.jpg",
+      "photo5.jpg"
+    ],
+    "housingTypes": ["apartment", "house", "room", "hotel"],
+    "facilities": [
+      "Breakfast",
+      "Air conditioning",
+      "Laptop friendly workspace",
+      "Baby seat",
+      "Washer",
+      "Towels",
+      "Fridge"
+    ],
+    "authorNames": [
+      "Eagles",
+      "The Animals",
+      "Anonymous Carpenter",
+      "Wizard Architect",
+      "Sith Lord"
+    ],
+    "authorEmails": [
+      "eagles@gmail.com",
+      "theanimals@gmail.com",
+      "aonymous_carpenter@gmail.com",
+      "wizard_architect@gmail.com",
+      "sith_lord@gmail.com"
+    ],
+    "authorTypes": ["Regular", "Pro"]
+  }
+}
