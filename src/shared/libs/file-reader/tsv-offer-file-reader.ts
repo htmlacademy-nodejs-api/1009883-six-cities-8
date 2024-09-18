@@ -116,7 +116,7 @@ export class TSVOfferFileReader extends EventEmitter implements FileReader {
       remainingData += chunk.toString();
 
       while ((nextLinePosition = remainingData.indexOf('\n')) >= 0) {
-        const line = remainingData.slice(0, nextLinePosition + 1);
+        const line = remainingData.slice(0, nextLinePosition);
         remainingData = remainingData.slice(++nextLinePosition);
         importedRowCount++;
 
