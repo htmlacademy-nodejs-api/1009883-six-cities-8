@@ -1,6 +1,11 @@
 #!/usr/bin/env node
 import { CLIApplication } from './cli/cli-application.js';
-import { HelpCommand, ImportCommand, VersionCommand } from './cli/index.js';
+import {
+  GenerateCommand,
+  HelpCommand,
+  ImportCommand,
+  VersionCommand,
+} from './cli/index.js';
 
 function bootstrap() {
   const cliApplication = new CLIApplication();
@@ -8,6 +13,7 @@ function bootstrap() {
     new HelpCommand(),
     new VersionCommand(),
     new ImportCommand(),
+    new GenerateCommand(),
   ]);
 
   cliApplication.processCommand(process.argv);
