@@ -2,10 +2,10 @@ import { createWriteStream, WriteStream } from 'node:fs';
 import { FileWriter } from './file-writer.interface.js';
 
 export class TSVFileWriter implements FileWriter {
-  private stream!: WriteStream;
+  private stream: WriteStream;
 
-  constructor(filename: string) {
-    this.stream = createWriteStream(filename, {
+  constructor(filepath: string) {
+    this.stream = createWriteStream(filepath, {
       flags: 'w',
       encoding: 'utf-8',
       autoClose: true,

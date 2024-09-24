@@ -4,8 +4,6 @@ import {
   Facilities,
   HousingType,
   Offer,
-  Photos,
-  User,
   UserType,
 } from '../../types/entities/index.js';
 import { FileReader } from './file-reader.interface.js';
@@ -22,19 +20,17 @@ export class TSVOfferFileReader extends EventEmitter implements FileReader {
     const [
       title,
       description,
-      dateAdded,
+      createdAt,
       city,
       preview,
       photos,
       isPremium,
-      isFavorite,
       rating,
       housingType,
       roomsNumber,
       guestsNumber,
       price,
       facilities,
-      commentsCount,
       latitude,
       longitude,
       authorName,
@@ -45,61 +41,27 @@ export class TSVOfferFileReader extends EventEmitter implements FileReader {
     return {
       title,
       description,
-      dateAdded: new Date(dateAdded),
+      createdAt,
       city: city as Cities,
       preview,
-      photos: this.parsePhotos(photos),
-      isPremium: !!isPremium,
-      isFavorite: !!isFavorite,
-      rating: this.parseRating(rating),
+      photos: photos.split('; '),
+      isPremium: isPremium.toLowerCase() === 'true',
+      rating: Number(rating),
       housingType: housingType as HousingType,
-      roomsNumber: this.parseRoomsNumber(roomsNumber),
-      guestsNumber: this.parseGuestsNumber(guestsNumber),
-      price: this.parsePrice(price),
-      facilities: this.parseFacilities(facilities),
-      author: this.parseUser(authorName, authorEmail, authorType as UserType),
-      commentsCount: this.parseCommentsCount(commentsCount),
+      roomsNumber: Number(roomsNumber),
+      guestsNumber: Number(guestsNumber),
+      price: Number(price),
+      facilities: facilities.split('; ') as Facilities[],
+      author: {
+        name: authorName,
+        email: authorEmail,
+        type: authorType as UserType,
+      },
       coordinates: {
-        latitude: this.parseCoord(latitude),
-        longitude: this.parseCoord(longitude),
+        latitude: Number(latitude),
+        longitude: Number(longitude),
       },
     };
-  }
-
-  private parsePhotos(photosString: string): Photos {
-    return photosString.split('; ') as Photos;
-  }
-
-  private parseRating(ratingString: string): number {
-    return Number.parseFloat(ratingString);
-  }
-
-  private parseRoomsNumber(roomsString: string): number {
-    return Number.parseInt(roomsString, 10);
-  }
-
-  private parseGuestsNumber(guestsString: string): number {
-    return Number.parseInt(guestsString, 10);
-  }
-
-  private parsePrice(priceString: string): number {
-    return Number.parseInt(priceString, 10);
-  }
-
-  private parseFacilities(facilitiesString: string): Facilities[] {
-    return facilitiesString.split('; ') as Facilities[];
-  }
-
-  private parseUser(name: string, email: string, type: UserType): User {
-    return { name, email, type };
-  }
-
-  private parseCommentsCount(commentsCountString: string): number {
-    return Number.parseInt(commentsCountString, 10);
-  }
-
-  private parseCoord(coordString: string): number {
-    return Number.parseFloat(coordString);
   }
 
   public async read(): Promise<void> {
@@ -114,14 +76,17 @@ export class TSVOfferFileReader extends EventEmitter implements FileReader {
 
     for await (const chunk of readStream) {
       remainingData += chunk.toString();
+      nextLinePosition = remainingData.indexOf('\n');
 
-      while ((nextLinePosition = remainingData.indexOf('\n')) >= 0) {
+      while (nextLinePosition >= 0) {
         const line = remainingData.slice(0, nextLinePosition);
         remainingData = remainingData.slice(++nextLinePosition);
         importedRowCount++;
 
         const parsedOffer = this.parseLineToOffer(line);
         this.emit('line', parsedOffer);
+
+        nextLinePosition = remainingData.indexOf('\n');
       }
     }
 

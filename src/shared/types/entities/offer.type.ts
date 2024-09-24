@@ -3,17 +3,14 @@ import { Facilities } from './facilities.enum.js';
 import { HousingType } from './housing-type.enum.js';
 import { User } from './user.type.js';
 
-export type Photos = [string, string, string, string, string, string];
-
 export type Offer = {
   title: string;
   description: string;
-  dateAdded: Date;
+  createdAt: string;
   city: Cities;
   preview: string;
-  photos: Photos;
+  photos: string[];
   isPremium: boolean;
-  isFavorite: boolean;
   rating: number;
   housingType: HousingType;
   roomsNumber: number;
@@ -21,7 +18,6 @@ export type Offer = {
   price: number;
   facilities: Facilities[];
   author: User;
-  commentsCount: number;
   coordinates: {
     latitude: number;
     longitude: number;
