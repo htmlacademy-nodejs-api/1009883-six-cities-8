@@ -4,6 +4,8 @@ import { Offer } from '../../shared/types/entities/index.js';
 import { Command } from './command.interface.js';
 
 export class ImportCommand implements Command {
+  public readonly name: string = '--import';
+
   private onImportedOffer(offer: Offer): void {
     console.info(offer);
   }
@@ -12,22 +14,24 @@ export class ImportCommand implements Command {
     console.info(`${count} rows imported.`);
   }
 
-  public getName(): string {
-    return '--import';
-  }
-
   public async execute(...parameters: string[]): Promise<void> {
     const [filename] = parameters;
+
+    if (!filename) {
+      console.error(`No filename was specified`);
+      return;
+    }
+
     const fileReader = new TSVOfferFileReader(filename.trim());
 
     fileReader.on('line', this.onImportedOffer);
     fileReader.on('end', this.onCompleteImport);
 
     try {
-      fileReader.read();
-    } catch (err) {
+      await fileReader.read();
+    } catch (error) {
       console.error(`Can't import data from file: ${filename}`);
-      console.error(getErrorMessage);
+      console.error(getErrorMessage(error));
     }
   }
 }

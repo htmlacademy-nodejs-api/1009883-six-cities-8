@@ -24,7 +24,7 @@
     ],
     "previews": [
       "hotel.jpg",
-      "apartement.png",
+      "apartment.png",
       "house.gif",
       "room.jpg",
       "my-preview.jpg"
@@ -36,7 +36,7 @@
       "photo4.jpg",
       "photo5.jpg"
     ],
-    "housingTypes": ["apartment", "house", "room", "hotel"],
+    "housingTypes": ["Apartment", "House", "Room", "Hotel"],
     "facilities": [
       "Breakfast",
       "Air conditioning",

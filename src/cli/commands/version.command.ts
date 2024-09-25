@@ -1,12 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { Command } from './command.interface.js';
 import { resolve } from 'node:path';
+import { getErrorMessage } from '../../shared/helpers/index.js';
 
 type PackageJSONConfg = {
   version: string;
 };
 
-function isPagckageJSONConfig(value: unknown): value is PackageJSONConfg {
+function isPackageJSONConfig(value: unknown): value is PackageJSONConfg {
   return (
     typeof value === 'object' &&
     value !== null &&
@@ -16,33 +17,29 @@ function isPagckageJSONConfig(value: unknown): value is PackageJSONConfg {
 }
 
 export class VersionCommand implements Command {
+  public readonly name: string = '--version';
+
   constructor(private readonly filePath: string = 'package.json') {}
 
   private readVersion(): string {
     const jsonContent = readFileSync(resolve(this.filePath), 'utf-8');
     const importedContent: unknown = JSON.parse(jsonContent);
 
-    if (!isPagckageJSONConfig(importedContent)) {
+    if (!isPackageJSONConfig(importedContent)) {
       throw new Error('Failed to parse json content.');
     }
 
     return importedContent.version;
   }
 
-  public getName(): string {
-    return '--version';
-  }
-
-  public async execute(..._parameters: string[]): Promise<void> {
+  public execute(..._parameters: string[]): void {
     try {
       const version = this.readVersion();
       console.info(version);
     } catch (error: unknown) {
       console.error(`Failed to read version from ${this.filePath}`);
 
-      if (error instanceof Error) {
-        console.error(error.message);
-      }
+      console.error(getErrorMessage(error));
     }
   }
 }

@@ -6,9 +6,7 @@ import {
 } from '../../helpers/index.js';
 import { MockServerData } from '../../types/index.js';
 import { OfferGenerator } from './index.js';
-
-const FIRST_WEEK_DAY = 1;
-const LAST_WEEK_DAY = 7;
+import { FIRST_WEEK_DAY, LAST_WEEK_DAY } from '../../constants/index.js';
 
 export class TSVOfferGenerator implements OfferGenerator {
   constructor(private readonly mockData: MockServerData) {}
@@ -25,37 +23,33 @@ export class TSVOfferGenerator implements OfferGenerator {
     const authorEmail = getRandomItem(this.mockData.authorEmails);
     const authorType = getRandomItem(this.mockData.authorTypes);
 
-    const dateAdded = dayjs()
+    const createdAt = dayjs()
       .subtract(generateRandomNumber(FIRST_WEEK_DAY, LAST_WEEK_DAY), 'day')
       .toISOString();
 
     const isPremium = getRandomItem(['true', 'false']);
-    const isFavorite = getRandomItem(['true', 'false']);
 
     const rating = generateRandomNumber(1, 5, 1);
     const roomsNumber = generateRandomNumber(1, 8);
     const guestsNumber = generateRandomNumber(1, 10);
     const price = generateRandomNumber(100, 1e5);
-    const commentsCount = generateRandomNumber(0, 500);
     const latitude = generateRandomNumber(-90, 90, 5);
     const longitude = generateRandomNumber(-180, 180, 5);
 
     return [
       title,
       description,
-      dateAdded,
+      createdAt,
       city,
       preview,
-      photos,
+      photos.join('; '),
       isPremium,
-      isFavorite,
       rating,
       housingType,
       roomsNumber,
       guestsNumber,
       price,
-      facilities,
-      commentsCount,
+      facilities.join('; '),
       latitude,
       longitude,
       authorName,
