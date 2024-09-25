@@ -9,7 +9,8 @@
   ],
   "main": "main.js",
   "scripts": {
-    "start": "npm run build && node ./dist/main.js",
+    "start": "npm run build && node ./dist/main.rest.js",
+    "start:dev": "npm run ts ./src/main.rest.ts | pino-pretty --colorize --translateTime SYS:standard",
     "build": "npm run clean && npm run compile",
     "cli:version": "npm run ts ./src/main.cli.ts -- --version",
     "cli:help": "npm run ts ./src/main.cli.ts -- --help",
@@ -30,6 +31,7 @@
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-prettier": "5.2.1",
     "json-server": "0.17.3",
+    "pino-pretty": "11.2.2",
     "prettier": "3.3.3",
     "rimraf": "5.0.1",
     "ts-node": "10.9.2",
@@ -44,6 +46,7 @@
   "dependencies": {
     "chalk": "^5.3.0",
     "dayjs": "1.11.13",
-    "got": "14.4.2"
+    "got": "14.4.2",
+    "pino": "9.4.0"
   }
 }
