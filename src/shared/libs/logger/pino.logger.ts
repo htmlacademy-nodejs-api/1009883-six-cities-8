@@ -1,7 +1,7 @@
 import { Logger as PinoInstance, pino, transport } from 'pino';
 import { Logger } from './logger.interface.js';
 import { getCurrentModuleDirectoryPath } from '../../helpers/index.js';
-import { resolve } from 'path';
+import { resolve } from 'node:path';
 
 export class PinoLogger implements Logger {
   private readonly logger: PinoInstance;
