@@ -6,11 +6,11 @@ import { Command } from './command.interface.js';
 export class ImportCommand implements Command {
   public readonly name: string = '--import';
 
-  private onImportedOffer(offer: Offer): void {
+  private onImportedOffer(offer: Offer) {
     console.info(offer);
   }
 
-  private onCompleteImport(count: number): void {
+  private onCompleteImport(count: number) {
     console.info(`${count} rows imported.`);
   }
 

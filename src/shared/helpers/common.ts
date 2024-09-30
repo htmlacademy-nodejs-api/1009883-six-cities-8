@@ -1,9 +1,5 @@
-export function generateRandomNumber(
-  min: number,
-  max: number,
-  numAfterDigit = 0,
-) {
-  return +(Math.random() * (max - min) + min).toFixed(numAfterDigit);
+export function generateRandomNumber(min: number, max: number, precision = 0) {
+  return +(Math.random() * (max - min) + min).toFixed(precision);
 }
 
 export function getRandomItem<T>(items: T[]): T {
@@ -18,5 +14,7 @@ export function getRandomItems<T>(items: T[]): T[] {
 }
 
 export function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : '';
+  return error instanceof Error
+    ? error.message
+    : 'Unknown error message. (Thrown value is not instance of Error).';
 }

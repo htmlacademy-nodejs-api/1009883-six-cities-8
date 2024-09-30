@@ -10,7 +10,7 @@ export class RestApplication {
     @inject(Component.Config) private readonly config: Config<RestSchema>,
   ) {}
 
-  public async init() {
+  public init() {
     this.logger.info('Application initialization');
     this.logger.info(`Get value from env $PORT: ${this.config.get('PORT')}`);
   }
