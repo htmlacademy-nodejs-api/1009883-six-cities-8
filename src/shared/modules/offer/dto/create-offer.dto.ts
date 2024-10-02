@@ -1,12 +1,13 @@
-import { Cities } from './cities.enum.js';
-import { Facilities } from './facilities.enum.js';
-import { HousingType } from './housing-type.enum.js';
-import { User } from './user.type.js';
+import {
+  Cities,
+  Facilities,
+  HousingType,
+} from '../../../types/entities/index.js';
 
-export type Offer = {
+export class CreateOfferDto {
+  createdAt?: Date;
   title: string;
   description: string;
-  createdAt?: Date;
   city: Cities;
   preview: string;
   photos: string[];
@@ -17,7 +18,7 @@ export type Offer = {
   guestsNumber: number;
   price: number;
   facilities: Facilities[];
-  author: User;
+  author: string;
   latitude: number;
   longitude: number;
-};
+}

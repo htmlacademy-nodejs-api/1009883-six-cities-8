@@ -41,7 +41,7 @@ export class TSVOfferFileReader extends EventEmitter implements FileReader {
     return {
       title,
       description,
-      createdAt,
+      createdAt: new Date(createdAt),
       city: city as Cities,
       preview,
       photos: photos.split('; '),
@@ -57,10 +57,8 @@ export class TSVOfferFileReader extends EventEmitter implements FileReader {
         email: authorEmail,
         type: authorType as UserType,
       },
-      coordinates: {
-        latitude: Number(latitude),
-        longitude: Number(longitude),
-      },
+      latitude: Number(latitude),
+      longitude: Number(longitude),
     };
   }
 
@@ -84,7 +82,10 @@ export class TSVOfferFileReader extends EventEmitter implements FileReader {
         importedRowCount++;
 
         const parsedOffer = this.parseLineToOffer(line);
-        this.emit('line', parsedOffer);
+
+        await new Promise((resolve) => {
+          this.emit('line', parsedOffer, resolve);
+        });
 
         nextLinePosition = remainingData.indexOf('\n');
       }

@@ -36,7 +36,7 @@ export class GenerateCommand implements Command {
       return;
     }
 
-    const count = Number.parseInt(countString, 10);
+    const count = Number(countString);
 
     try {
       await this.load(url);
