@@ -43,6 +43,6 @@ export class DefaultUserService implements UserService {
       return existingUser;
     }
 
-    return await this.create(dto, salt);
+    return this.create(dto, salt);
   }
 }
