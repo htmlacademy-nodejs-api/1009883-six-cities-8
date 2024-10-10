@@ -294,6 +294,10 @@ components:
         - commentsCount
 
       properties:
+        id:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+
         title:
           type: string
           example: 'Hotel California'
