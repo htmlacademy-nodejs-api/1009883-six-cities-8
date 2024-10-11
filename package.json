@@ -10,7 +10,7 @@
   "main": "main.js",
   "scripts": {
     "start": "npm run build && node ./dist/main.rest.js",
-    "start:dev": "npm run ts ./src/main.rest.ts | pino-pretty --colorize --translateTime SYS:standard",
+    "start:dev": "nodemon -L",
     "build": "npm run clean && npm run compile",
     "cli:version": "npm run ts ./src/main.cli.ts -- --version",
     "cli:help": "npm run ts ./src/main.cli.ts -- --help",
@@ -34,6 +34,7 @@
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-prettier": "5.2.1",
     "json-server": "0.17.3",
+    "nodemon": "3.1.7",
     "pino-pretty": "11.2.2",
     "prettier": "3.3.3",
     "rimraf": "5.0.1",
