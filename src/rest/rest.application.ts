@@ -4,6 +4,7 @@ import { Logger } from '../shared/libs/logger/index.js';
 import { Component } from '../shared/types/index.js';
 import { DatabaseClient } from '../shared/libs/database-client/index.js';
 import { getMongoURI } from '../shared/helpers/index.js';
+import { OfferService } from '../shared/modules/offer/offer-service.interface.js';
 
 @injectable()
 export class RestApplication {
@@ -12,6 +13,7 @@ export class RestApplication {
     @inject(Component.Config) private readonly config: Config<RestSchema>,
     @inject(Component.DatabaseClient)
     private readonly databaseClient: DatabaseClient,
+    @inject(Component.OfferService) private readonly offerService: OfferService,
   ) {}
 
   private async initDb() {
@@ -35,5 +37,9 @@ export class RestApplication {
     this.logger.info(`Get value from env $PORT: ${this.config.get('PORT')}`);
 
     await this.initDb();
+
+    const offers = await this.offerService.find();
+
+    console.log(offers);
   }
 }
