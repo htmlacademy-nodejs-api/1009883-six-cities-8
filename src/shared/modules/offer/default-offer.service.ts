@@ -36,10 +36,8 @@ export class DefaultOfferService implements OfferService {
   }
 
   public async find(
-    count?: number,
+    count = DEFAULT_OFFER_COUNT,
   ): Promise<types.DocumentType<OfferEntity>[]> {
-    const limit = count ?? DEFAULT_OFFER_COUNT;
-
     // return this.offerModel
     //   .find({}, {}, { limit, sort: { createdAt: SortType.Down } })
     //   .populate(['author']);
@@ -73,7 +71,7 @@ export class DefaultOfferService implements OfferService {
         },
       },
       // { $unset: 'comments' },
-      { $limit: limit },
+      { $limit: count },
       { $sort: { createdAt: SortType.Down } },
     ]);
   }
@@ -104,6 +102,8 @@ export class DefaultOfferService implements OfferService {
   }
 
   public async exists(documentId: string): Promise<boolean> {
-    return (await this.offerModel.exists({ _id: documentId })) !== null;
+    const offerExists = await this.offerModel.exists({ _id: documentId });
+
+    return offerExists !== null;
   }
 }

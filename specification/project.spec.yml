@@ -225,10 +225,14 @@ components:
         title:
           type: string
           example: 'Hotel California'
+          minLength: 10
+          maxLength: 100
 
         description:
           type: string
           example: 'Such a lovely place'
+          minLength: 20
+          maxLength: 1024
 
         city:
           $ref: '#/components/schemas/cities'
@@ -259,14 +263,20 @@ components:
         roomsNumber:
           type: integer
           example: 4
+          minimum: 1
+          maximum: 8
 
         guestsNumber:
           type: integer
           example: 4
+          minimum: 1
+          maximum: 10
 
         price:
           type: integer
           example: 10000
+          minimum: 100
+          maximum: 100000
 
         facilities:
           $ref: '#/components/schemas/facilities'
