@@ -20,6 +20,8 @@ export class RestApplication {
     private readonly appExceptionFilter: ExceptionFilter,
     @inject(Component.UserController)
     private readonly userController: Controller,
+    @inject(Component.OfferController)
+    private readonly offerController: Controller,
   ) {
     this.server = express();
   }
@@ -52,6 +54,7 @@ export class RestApplication {
   private initControllers() {
     this.logger.info('Init controllers');
     this.server.use('/users', this.userController.router);
+    this.server.use('/offers', this.offerController.router);
     this.logger.info('Controller initialization completed');
   }
 
