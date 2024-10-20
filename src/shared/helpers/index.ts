@@ -3,6 +3,8 @@ export {
   getRandomItem,
   getRandomItems,
   getErrorMessage,
+  fillDTO,
+  createErrorObject,
 } from './common.js';
 export { getCurrentModuleDirectoryPath } from './file-system.js';
 export { getMongoURI } from './database.js';

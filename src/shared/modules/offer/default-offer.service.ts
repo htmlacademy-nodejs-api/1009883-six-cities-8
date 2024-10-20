@@ -11,6 +11,7 @@ import {
 } from './offer.constant.js';
 import { UpdateOfferDtoOfferDto } from './dto/update-offer.dto.js';
 import { Cities } from '../../types/entities/cities.enum.js';
+import { Types } from 'mongoose';
 
 @injectable()
 export class DefaultOfferService implements OfferService {
@@ -32,14 +33,58 @@ export class DefaultOfferService implements OfferService {
   public async findById(
     offerId: string,
   ): Promise<types.DocumentType<OfferEntity> | null> {
-    return this.offerModel.findById(offerId).populate(['author']);
+    // return this.offerModel.findById(offerId).populate(['author']);
+
+    const offerArray =
+      await this.offerModel.aggregate<types.DocumentType<OfferEntity> | null>([
+        {
+          $match: {
+            _id: new Types.ObjectId(offerId),
+          },
+        },
+        // Почему первый вариант далее не работаает?
+        // {
+        //   $lookup: {
+        //     from: 'comments',
+        //     let: { offerId: '$_id' },
+        //     pipeline: [{ $match: { offer: '$$offerId' } }],
+        //     as: 'comments',
+        //   },
+        // },
+        // {
+        //   $lookup: {
+        //     from: 'comments',
+        //     localField: '_id',
+        //     foreignField: 'offer',
+        //     as: 'comments',
+        //   },
+        // },
+        {
+          $lookup: {
+            from: 'comments',
+            let: { offerId: '$_id' },
+            pipeline: [
+              { $match: { $expr: { $eq: ['$offer', '$$offerId'] } } },
+              { $project: { rating: 1 } },
+            ],
+            as: 'comments',
+          },
+        },
+        {
+          $addFields: {
+            id: { $toString: '$_id' },
+            commentsCount: { $size: '$comments' },
+            rating: { $avg: '$comments.rating' },
+          },
+        },
+      ]);
+
+    return offerArray[0];
   }
 
   public async find(
-    count?: number,
+    count = DEFAULT_OFFER_COUNT,
   ): Promise<types.DocumentType<OfferEntity>[]> {
-    const limit = count ?? DEFAULT_OFFER_COUNT;
-
     // return this.offerModel
     //   .find({}, {}, { limit, sort: { createdAt: SortType.Down } })
     //   .populate(['author']);
@@ -73,7 +118,7 @@ export class DefaultOfferService implements OfferService {
         },
       },
       // { $unset: 'comments' },
-      { $limit: limit },
+      { $limit: count },
       { $sort: { createdAt: SortType.Down } },
     ]);
   }
@@ -104,6 +149,8 @@ export class DefaultOfferService implements OfferService {
   }
 
   public async exists(documentId: string): Promise<boolean> {
-    return (await this.offerModel.exists({ _id: documentId })) !== null;
+    const offerExists = await this.offerModel.exists({ _id: documentId });
+
+    return offerExists !== null;
   }
 }

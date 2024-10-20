@@ -10,6 +10,7 @@ services:
       - ./:/home/node/app
     ports:
       - 127.0.0.1:3123:3123
+      - 127.0.0.1:5000:${PORT}
 
   db:
     image: mongo:4.2
