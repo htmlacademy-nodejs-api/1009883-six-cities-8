@@ -5,6 +5,7 @@ import { Logger } from '../../logger/index.js';
 import { Route } from '../types/route.interface.js';
 import { StatusCodes } from 'http-status-codes';
 import aAsyncHandler from 'express-async-handler';
+import { HttpMethod } from '../types/http-method.enum.js';
 
 @injectable()
 export abstract class BaseController implements Controller {
@@ -17,7 +18,14 @@ export abstract class BaseController implements Controller {
     return this._router;
   }
 
+  public addRoutes(routes: Route | Route[]) {
+    for (const route of [routes].flat(2)) {
+      this.addRoute(route);
+    }
+  }
+
   public addRoute(route: Route) {
+    route.method ??= HttpMethod.get;
     const wrapperAsyncHandler = aAsyncHandler(route.handler.bind(this));
     this._router[route.method](route.path, wrapperAsyncHandler);
     this.logger.info(
