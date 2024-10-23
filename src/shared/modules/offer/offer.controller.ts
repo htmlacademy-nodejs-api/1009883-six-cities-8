@@ -23,11 +23,13 @@ export class OfferController extends BaseController {
 
     this.logger.info('Register routes for OfferController…');
 
-    this.addRoute({
-      path: '/id/:id',
-      method: HttpMethod.Get,
-      handler: this.findById,
-    });
+    this.addRoutes([
+      {
+        path: '/:id',
+        method: HttpMethod.get,
+        handler: this.findById,
+      },
+    ]);
   }
 
   public async findById({ params }: Request, res: Response) {
