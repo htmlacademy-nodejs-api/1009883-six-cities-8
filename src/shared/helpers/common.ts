@@ -27,8 +27,6 @@ export function fillDTO<T, V>(someDto: ClassConstructor<T>, plainObject: V) {
   });
 }
 
-export function createErrorObject(message: string) {
-  return {
-    error: message,
-  };
+export function createErrorObject(error: string) {
+  return { error };
 }

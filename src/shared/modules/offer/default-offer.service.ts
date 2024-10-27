@@ -9,7 +9,7 @@ import {
   DEFAULT_OFFER_COUNT,
   DEFAULT_PREMIUM_OFFER_COUNT,
 } from './offer.constant.js';
-import { UpdateOfferDtoOfferDto } from './dto/update-offer.dto.js';
+import { UpdateOfferDto } from './dto/update-offer.dto.js';
 import { Cities } from '../../types/entities/cities.enum.js';
 import { Types } from 'mongoose';
 
@@ -42,23 +42,6 @@ export class DefaultOfferService implements OfferService {
             _id: new Types.ObjectId(offerId),
           },
         },
-        // Почему первый вариант далее не работаает?
-        // {
-        //   $lookup: {
-        //     from: 'comments',
-        //     let: { offerId: '$_id' },
-        //     pipeline: [{ $match: { offer: '$$offerId' } }],
-        //     as: 'comments',
-        //   },
-        // },
-        // {
-        //   $lookup: {
-        //     from: 'comments',
-        //     localField: '_id',
-        //     foreignField: 'offer',
-        //     as: 'comments',
-        //   },
-        // },
         {
           $lookup: {
             from: 'comments',
@@ -71,12 +54,23 @@ export class DefaultOfferService implements OfferService {
           },
         },
         {
+          $lookup: {
+            from: 'users',
+            let: { authorId: '$author' },
+            pipeline: [{ $match: { $expr: { $eq: ['$_id', '$$authorId'] } } }],
+            as: 'authorlookup',
+          },
+        },
+        {
           $addFields: {
             id: { $toString: '$_id' },
             commentsCount: { $size: '$comments' },
             rating: { $avg: '$comments.rating' },
+            author: { $arrayElemAt: ['$authorlookup', 0] },
           },
         },
+        { $unset: 'comments' },
+        { $unset: 'authorlookup' },
       ]);
 
     return offerArray[0];
@@ -95,17 +89,18 @@ export class DefaultOfferService implements OfferService {
           from: 'comments',
           let: { offerId: '$_id' },
           pipeline: [
-            { $match: { offer: '$$offerId' } },
+            { $match: { $expr: { $eq: ['$offer', '$$offerId'] } } },
             { $project: { rating: 1 } },
-            // {
-            //   $group: {
-            //     _id: null,
-            //     totalCount: { $sum: 1 },
-            //     averageRating: { $avg: '$rating' },
-            //   },
-            // },
           ],
           as: 'comments',
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          let: { authorId: '$author' },
+          pipeline: [{ $match: { $expr: { $eq: ['$_id', '$$authorId'] } } }],
+          as: 'authorlookup',
         },
       },
       {
@@ -113,11 +108,11 @@ export class DefaultOfferService implements OfferService {
           id: { $toString: '$_id' },
           commentsCount: { $size: '$comments' },
           rating: { $avg: '$comments.rating' },
-          // commentsCount: '$comments[0].totalCount',
-          // rating: '$comments[0].averageRating',
+          author: { $arrayElemAt: ['$authorlookup', 0] },
         },
       },
-      // { $unset: 'comments' },
+      { $unset: 'comments' },
+      { $unset: 'authorlookup' },
       { $limit: count },
       { $sort: { createdAt: SortType.Down } },
     ]);
@@ -131,7 +126,7 @@ export class DefaultOfferService implements OfferService {
 
   public async updateById(
     offerId: string,
-    dto: UpdateOfferDtoOfferDto,
+    dto: UpdateOfferDto,
   ): Promise<types.DocumentType<OfferEntity> | null> {
     return this.offerModel
       .findByIdAndUpdate(offerId, dto, { new: true })
