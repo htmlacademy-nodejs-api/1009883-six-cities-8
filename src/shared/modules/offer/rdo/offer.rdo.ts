@@ -1,10 +1,10 @@
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import {
   Cities,
   Facilities,
   HousingType,
-  User,
 } from '../../../types/entities/index.js';
+import { UserRdo } from '../../user/index.js';
 
 export class OfferRdo {
   @Expose()
@@ -53,7 +53,8 @@ export class OfferRdo {
   facilities: Facilities[];
 
   @Expose()
-  author: User;
+  @Type(() => UserRdo)
+  author: UserRdo;
 
   @Expose()
   latitude: number;

@@ -5,3 +5,11 @@ GET http://localhost:5000/offers/66fd2589d1f647af243b2321 HTTP/1.1
 Content-Type: application/json
 
 ###
+
+# Предложения
+## Все предложения
+
+GET http://localhost:5000/offers/ HTTP/1.1
+Content-Type: application/json
+
+###
