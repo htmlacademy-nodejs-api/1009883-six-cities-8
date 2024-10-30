@@ -25,5 +25,9 @@
     "lib": ["ESNext"]
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "**/*.test.ts"]
+  "exclude": ["node_modules", "**/*.test.ts"],
+  "ts-node": {
+    "esm": true
+  },
+  "files": ["./custom.d.ts"]
 }

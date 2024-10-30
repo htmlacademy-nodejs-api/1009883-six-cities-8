@@ -5,7 +5,11 @@ import { Logger } from '../shared/libs/logger/index.js';
 import { Component } from '../shared/types/index.js';
 import { DatabaseClient } from '../shared/libs/database-client/index.js';
 import { getMongoURI } from '../shared/helpers/index.js';
-import { Controller, ExceptionFilter } from '../shared/libs/rest/index.js';
+import {
+  Controller,
+  ExceptionFilter,
+  ParseTokenMiddleware,
+} from '../shared/libs/rest/index.js';
 
 @injectable()
 export class RestApplication {
@@ -22,6 +26,8 @@ export class RestApplication {
     private readonly userController: Controller,
     @inject(Component.OfferController)
     private readonly offerController: Controller,
+    @inject(Component.AuthExceptionFilter)
+    private readonly authExceptionFilter: ExceptionFilter,
   ) {
     this.server = express();
   }
@@ -60,16 +66,27 @@ export class RestApplication {
 
   private initMiddleware() {
     this.logger.info('Init app-level middleware');
+
+    const authenticateMiddleware = new ParseTokenMiddleware(
+      this.config.get('JWT_SECRET'),
+    );
+
     this.server.use(express.json());
     this.server.use(
       '/upload',
       express.static(this.config.get('UPLOAD_DIRECTORY')),
+    );
+    this.server.use(
+      authenticateMiddleware.execute.bind(authenticateMiddleware),
     );
     this.logger.info('App-level middleware initialization completed');
   }
 
   private initExceptionFilters() {
     this.logger.info('Init exception filters');
+    this.server.use(
+      this.authExceptionFilter.catch.bind(this.authExceptionFilter),
+    );
     this.server.use(
       this.appExceptionFilter.catch.bind(this.appExceptionFilter),
     );
