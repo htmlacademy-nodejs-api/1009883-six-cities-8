@@ -3,7 +3,9 @@ import { Request, Response } from 'express';
 import {
   BaseController,
   DocumentExistsMiddleware,
+  HttpError,
   HttpMethod,
+  PrivateRouteMiddleware,
   ValidateDtoMiddleware,
   ValidateObjectIdMiddleware,
 } from '../../libs/rest/index.js';
@@ -18,6 +20,7 @@ import { CreateOfferRequest } from './type/create-offer-request.type.js';
 import { UpdateOfferDto } from './dto/update-offer.dto.js';
 import { CreateOfferDto } from './dto/create-offer.dto.js';
 import { GetOffersQueryDto } from './dto/get-offers-query.dto.js';
+import { StatusCodes } from 'http-status-codes';
 
 @injectable()
 export class OfferController extends BaseController {
@@ -36,6 +39,12 @@ export class OfferController extends BaseController {
     ];
 
     this.addRoutes([
+      {
+        path: '/:offerId/favorites',
+        method: HttpMethod.post,
+        handler: this.addToFavorites,
+        middlewares: [new PrivateRouteMiddleware(), ...offerIdMiddlewares],
+      },
       {
         path: '/:offerId',
         handler: this.show,
@@ -108,6 +117,29 @@ export class OfferController extends BaseController {
     const updatedOffer = await this.offerService.findById(result?.id);
 
     this.ok(res, fillDTO(OfferRdo, updatedOffer));
+  }
+
+  public async addToFavorites(
+    { params, tokenPayload }: Request<ParamOfferId, unknown>,
+    res: Response,
+  ) {
+    const result = await this.offerService.addToFavorite(
+      params.offerId,
+      tokenPayload.id,
+    );
+
+    if (!result) {
+      throw new HttpError(
+        StatusCodes.BAD_REQUEST,
+        `Adding offer with id "${params.offerId}" to favorites failed`,
+        'OfferController',
+      );
+    }
+
+    this.created(
+      res,
+      `Offer with id "${params.offerId}" was added to favorites`,
+    );
   }
 
   public async getPremiumOfferByCity() {}

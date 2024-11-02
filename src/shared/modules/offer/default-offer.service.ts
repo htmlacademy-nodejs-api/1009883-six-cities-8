@@ -12,6 +12,7 @@ import {
 import { UpdateOfferDto } from './dto/update-offer.dto.js';
 import { Cities } from '../../types/entities/cities.enum.js';
 import { Types } from 'mongoose';
+import { UserService } from '../user/index.js';
 
 @injectable()
 export class DefaultOfferService implements OfferService {
@@ -19,6 +20,7 @@ export class DefaultOfferService implements OfferService {
     @inject(Component.Logger) private readonly logger: Logger,
     @inject(Component.OfferModel)
     private readonly offerModel: types.ModelType<OfferEntity>,
+    @inject(Component.UserService) private readonly userService: UserService,
   ) {}
 
   public async create(
@@ -147,5 +149,22 @@ export class DefaultOfferService implements OfferService {
     const offerExists = await this.offerModel.exists({ _id: documentId });
 
     return offerExists !== null;
+  }
+
+  public async addToFavorite(
+    offerId: string,
+    userId: string,
+  ): Promise<boolean> {
+    const user = await this.userService.findById(userId);
+
+    if (!user) {
+      return false;
+    }
+
+    user.favorites.push(new Types.ObjectId(offerId));
+
+    const updatedUser = await this.userService.updateById(userId, user);
+
+    return !!updatedUser;
   }
 }
