@@ -5,11 +5,10 @@ POST http://localhost:5000/users/register HTTP/1.1
 Content-Type: application/json
 
 {
-  "email": "keks@keks.net",
+  "email": "keks1@keks.net",
   "avatarPath": "keks.png",
-  "name": "Keks",
-  "password": "123456",
-  "type": "Regular"
+  "name": "Keks1",
+  "password": "123456"
 }
 
 ###
@@ -20,7 +19,7 @@ POST http://localhost:5000/users/login HTTP/1.1
 Content-Type: application/json
 
 {
-  "email": "keks111@keks.net",
+  "email": "keks@keks.net",
   "password": "123456"
 }
 

@@ -10,7 +10,6 @@ import {
 } from '../../libs/rest/index.js';
 import { Component } from '../../types/component.enum.js';
 import { Logger } from '../../libs/logger/index.js';
-import { CreateUserRequest } from './type/create-user-request.type.js';
 import { UserService } from './user-service.interface.js';
 import { Config, RestSchema } from '../../libs/config/index.js';
 import { StatusCodes } from 'http-status-codes';
@@ -21,6 +20,7 @@ import { CreateUserDto } from './dto/create-user.dto.js';
 import { LoginUserDto } from './dto/login-user.dto.js';
 import { AuthService } from '../auth/index.js';
 import { LoggedUserRdo } from './rdo/logged-user.rdo.js';
+import { UserType } from '../../types/entities/index.js';
 
 @injectable()
 export class UserController extends BaseController {
@@ -64,9 +64,20 @@ export class UserController extends BaseController {
   }
 
   public async create(
-    { body }: CreateUserRequest,
+    {
+      body,
+      tokenPayload,
+    }: Request<Record<string, unknown>, Record<string, unknown>, CreateUserDto>,
     res: Response,
   ): Promise<void> {
+    if (tokenPayload) {
+      throw new HttpError(
+        StatusCodes.UNAUTHORIZED,
+        `Only anonymous users are allowed to register a new account`,
+        'UserController',
+      );
+    }
+
     const existingUser = await this.userService.findByEmail(body.email);
 
     if (existingUser) {
@@ -76,6 +87,8 @@ export class UserController extends BaseController {
         'UserController',
       );
     }
+
+    body.type = UserType.Regular;
 
     const result = await this.userService.create(
       body,
