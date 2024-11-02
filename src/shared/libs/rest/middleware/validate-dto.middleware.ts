@@ -17,13 +17,17 @@ export class ValidateDtoMiddleware implements Middleware {
     next: NextFunction,
   ): Promise<void> {
     const plain = req[this.type];
-    const dtoInstance = plainToInstance(this.dto, plain);
+    const dtoInstance = plainToInstance(this.dto, plain, {
+      excludeExtraneousValues: true,
+    });
     const errors = await validate(dtoInstance);
 
     if (errors.length > 0) {
       res.status(StatusCodes.BAD_REQUEST).send(errors);
       return;
     }
+
+    req[this.type] = dtoInstance;
 
     next();
   }
