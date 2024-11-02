@@ -7,6 +7,7 @@ import {
   IsMongoId,
   IsNumber,
   IsOptional,
+  IsString,
   Max,
   MaxLength,
   Min,
@@ -27,10 +28,12 @@ export class CreateOfferDto {
   )
   createdAt?: Date;
 
+  @IsString({ message: CreateOfferValidationMessage.title.invalidFormat })
   @MinLength(10, { message: CreateOfferValidationMessage.title.minLength })
   @MaxLength(100, { message: CreateOfferValidationMessage.title.maxLength })
   title: string;
 
+  @IsString({ message: CreateOfferValidationMessage.description.invalidFormat })
   @MinLength(20, {
     message: CreateOfferValidationMessage.description.minLength,
   })
@@ -42,10 +45,15 @@ export class CreateOfferDto {
   @IsEnum(Cities, { message: CreateOfferValidationMessage.city.invalid })
   city: Cities;
 
+  @IsString({ message: CreateOfferValidationMessage.preview.invalidFormat })
   @MaxLength(256, { message: CreateOfferValidationMessage.preview.maxLength })
   preview: string;
 
   @IsArray({ message: CreateOfferValidationMessage.photos.invalidFormat })
+  @IsString({
+    each: true,
+    message: CreateOfferValidationMessage.preview.invalidFormat,
+  })
   @MaxLength(256, {
     each: true,
     message: CreateOfferValidationMessage.photos.maxLength,
@@ -72,7 +80,7 @@ export class CreateOfferDto {
   @Max(10, { message: CreateOfferValidationMessage.roomsNumber.maxValue })
   guestsNumber: number;
 
-  @IsInt({ message: CreateOfferValidationMessage.price.invalidFormat })
+  @IsNumber({}, { message: CreateOfferValidationMessage.price.invalidFormat })
   @Min(100, { message: CreateOfferValidationMessage.price.minValue })
   @Max(100000, { message: CreateOfferValidationMessage.price.maxValue })
   price: number;

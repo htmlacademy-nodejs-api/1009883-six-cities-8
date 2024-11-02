@@ -4,5 +4,6 @@ export const CreateLoginUserMessage = {
   },
   password: {
     invalidFormat: 'password is required',
+    lengthField: 'min length for password is 6, max is 12',
   },
 } as const;

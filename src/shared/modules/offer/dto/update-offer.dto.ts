@@ -6,6 +6,7 @@ import {
   IsInt,
   IsNumber,
   IsOptional,
+  IsString,
   Max,
   MaxLength,
   Min,
@@ -27,11 +28,13 @@ export class UpdateOfferDto {
   createdAt?: Date;
 
   @IsOptional()
+  @IsString({ message: UpdateOfferValidationMessage.title.invalidFormat })
   @MinLength(10, { message: UpdateOfferValidationMessage.title.minLength })
   @MaxLength(100, { message: UpdateOfferValidationMessage.title.maxLength })
   title?: string;
 
   @IsOptional()
+  @IsString({ message: UpdateOfferValidationMessage.description.invalidFormat })
   @MinLength(20, {
     message: UpdateOfferValidationMessage.description.minLength,
   })
@@ -45,11 +48,16 @@ export class UpdateOfferDto {
   city?: Cities;
 
   @IsOptional()
+  @IsString({ message: UpdateOfferValidationMessage.preview.invalidFormat })
   @MaxLength(256, { message: UpdateOfferValidationMessage.preview.maxLength })
   preview?: string;
 
   @IsOptional()
   @IsArray({ message: UpdateOfferValidationMessage.photos.invalidFormat })
+  @IsString({
+    each: true,
+    message: UpdateOfferValidationMessage.photos.invalidFormat,
+  })
   @MaxLength(256, {
     each: true,
     message: UpdateOfferValidationMessage.photos.maxLength,
@@ -81,7 +89,7 @@ export class UpdateOfferDto {
   guestsNumber?: number;
 
   @IsOptional()
-  @IsInt({ message: UpdateOfferValidationMessage.price.invalidFormat })
+  @IsNumber({}, { message: UpdateOfferValidationMessage.price.invalidFormat })
   @Min(100, { message: UpdateOfferValidationMessage.price.minValue })
   @Max(100000, { message: UpdateOfferValidationMessage.price.maxValue })
   price?: number;
