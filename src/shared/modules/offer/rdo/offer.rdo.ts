@@ -61,4 +61,7 @@ export class OfferRdo {
 
   @Expose()
   longitude: number;
+
+  @Expose()
+  isFavorite: boolean;
 }

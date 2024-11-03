@@ -21,6 +21,7 @@ import { UpdateOfferDto } from './dto/update-offer.dto.js';
 import { CreateOfferDto } from './dto/create-offer.dto.js';
 import { GetOffersQueryDto } from './dto/get-offers-query.dto.js';
 import { StatusCodes } from 'http-status-codes';
+import { UserService } from '../user/index.js';
 
 @injectable()
 export class OfferController extends BaseController {
@@ -28,6 +29,8 @@ export class OfferController extends BaseController {
     @inject(Component.Logger) protected readonly logger: Logger,
     @inject(Component.OfferService)
     protected readonly offerService: OfferService,
+    @inject(Component.UserService)
+    protected readonly userService: UserService,
   ) {
     super(logger);
 
@@ -85,10 +88,27 @@ export class OfferController extends BaseController {
     ]);
   }
 
-  public async show({ params }: Request<ParamOfferId>, res: Response) {
+  public async show(
+    { params, tokenPayload }: Request<ParamOfferId>,
+    res: Response,
+  ) {
     const { offerId } = params;
 
-    const offer = await this.offerService.findById(offerId);
+    const offer = await this.offerService.findById(offerId, tokenPayload?.id);
+
+    // if (offer) {
+    //   offer.isFavorite = false;
+
+    //   if (tokenPayload) {
+    //     const user = await this.userService.findById(tokenPayload.id);
+
+    //     if (user) {
+    //       offer.isFavorite =
+    //         user.favorites.findIndex((fav) => fav.toString() === offer.id) !==
+    //         -1;
+    //     }
+    //   }
+    // }
 
     this.ok(res, fillDTO(OfferRdo, offer));
   }

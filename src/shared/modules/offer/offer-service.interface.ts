@@ -7,7 +7,10 @@ import { DocumentExists } from '../../types/index.js';
 
 export interface OfferService extends DocumentExists {
   create(dto: CreateOfferDto): Promise<DocumentType<OfferEntity>>;
-  findById(offerId: string): Promise<DocumentType<OfferEntity> | null>;
+  findById(
+    offerId: string,
+    userId?: string,
+  ): Promise<DocumentType<OfferEntity> | null>;
   find(count?: number): Promise<DocumentType<OfferEntity>[]>;
   deleteById(offerId: string): Promise<DocumentType<OfferEntity> | null>;
   updateById(

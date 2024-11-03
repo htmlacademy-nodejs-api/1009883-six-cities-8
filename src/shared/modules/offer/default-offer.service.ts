@@ -11,7 +11,7 @@ import {
 } from './offer.constant.js';
 import { UpdateOfferDto } from './dto/update-offer.dto.js';
 import { Cities } from '../../types/entities/cities.enum.js';
-import { Types } from 'mongoose';
+import { PipelineStage, Types } from 'mongoose';
 import { UserService } from '../user/index.js';
 
 @injectable()
@@ -34,8 +34,48 @@ export class DefaultOfferService implements OfferService {
 
   public async findById(
     offerId: string,
+    userId?: string,
   ): Promise<types.DocumentType<OfferEntity> | null> {
-    // return this.offerModel.findById(offerId).populate(['author']);
+    let favAggregation: PipelineStage[] = [];
+
+    if (userId) {
+      favAggregation = [
+        {
+          $lookup: {
+            from: 'users',
+            pipeline: [
+              {
+                $match: {
+                  _id: new Types.ObjectId(userId),
+                },
+              },
+              { $project: { favorites: 1 } },
+            ],
+            as: 'currentUserLookup',
+          },
+        },
+        {
+          $addFields: {
+            currentUser: { $arrayElemAt: ['$currentUserLookup', 0] },
+          },
+        },
+        {
+          $addFields: {
+            isFavorite: { $in: ['$_id', '$currentUser.favorites'] },
+          },
+        },
+        { $unset: 'currentUserLookup' },
+        { $unset: 'currentUser' },
+      ];
+    } else {
+      favAggregation = [
+        {
+          $addFields: {
+            isFavorite: false,
+          },
+        },
+      ];
+    }
 
     const offerArray =
       await this.offerModel.aggregate<types.DocumentType<OfferEntity> | null>([
@@ -73,6 +113,7 @@ export class DefaultOfferService implements OfferService {
         },
         { $unset: 'comments' },
         { $unset: 'authorlookup' },
+        ...favAggregation,
       ]);
 
     return offerArray[0];
