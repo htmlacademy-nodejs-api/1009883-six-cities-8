@@ -69,7 +69,7 @@ export class DefaultOfferService implements OfferService {
     return this.offerModel.aggregate([
       ...generalOfferAggregation,
       ...favAggregation,
-      { $limit: +count },
+      { $limit: count },
       { $sort: { createdAt: SortType.Down } },
     ]);
   }

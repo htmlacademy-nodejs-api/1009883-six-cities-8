@@ -15,7 +15,6 @@ import { OfferService } from './offer-service.interface.js';
 import { fillDTO } from '../../helpers/common.js';
 import { OfferRdo } from './rdo/offer.rdo.js';
 import { ParamOfferId } from './type/param-offerid.type.js';
-import { CreateOfferRequest } from './type/create-offer-request.type.js';
 import { UpdateOfferDto } from './dto/update-offer.dto.js';
 import { CreateOfferDto } from './dto/create-offer.dto.js';
 import { GetOffersQueryDto } from './dto/get-offers-query.dto.js';
@@ -82,7 +81,10 @@ export class OfferController extends BaseController {
         path: '/',
         method: HttpMethod.post,
         handler: this.create,
-        middlewares: [new ValidateDtoMiddleware(CreateOfferDto)],
+        middlewares: [
+          new PrivateRouteMiddleware(),
+          new ValidateDtoMiddleware(CreateOfferDto),
+        ],
       },
     ]);
   }
@@ -129,8 +131,21 @@ export class OfferController extends BaseController {
     this.ok(res, fillDTO(OfferRdo, offers));
   }
 
-  public async create({ body }: CreateOfferRequest, res: Response) {
-    const result = await this.offerService.create(body);
+  public async create(
+    {
+      body,
+      tokenPayload,
+    }: Request<
+      Record<string, unknown>,
+      Record<string, unknown>,
+      CreateOfferDto
+    >,
+    res: Response,
+  ) {
+    const result = await this.offerService.create({
+      ...body,
+      author: tokenPayload.id,
+    });
     const offer = await this.offerService.findById(result.id);
     this.created(res, fillDTO(OfferRdo, offer));
   }
