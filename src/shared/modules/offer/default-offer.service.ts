@@ -12,7 +12,7 @@ import {
 import { UpdateOfferDto } from './dto/update-offer.dto.js';
 import { Cities } from '../../types/entities/cities.enum.js';
 import { Types } from 'mongoose';
-import { UserService } from '../user/index.js';
+import { UserEntity, UserService } from '../user/index.js';
 import {
   generalOfferAggregation,
   getIsFavoriteAggregation,
@@ -70,6 +70,31 @@ export class DefaultOfferService implements OfferService {
       ...generalOfferAggregation,
       ...favAggregation,
       { $limit: count },
+      { $sort: { createdAt: SortType.Down } },
+    ]);
+  }
+
+  public async findFavorite(
+    userId: string,
+  ): Promise<types.DocumentType<OfferEntity>[]> {
+    const currentUser = (await this.userService.findById(
+      userId,
+    )) as types.DocumentType<UserEntity>;
+
+    return this.offerModel.aggregate([
+      // {
+      //   $addFields: {
+      //     currentUser: currentUser,
+      //   },
+      // },
+      { $match: { $expr: { $in: ['$_id', currentUser.favorites] } } },
+      ...generalOfferAggregation,
+      {
+        $addFields: {
+          isFavorite: true,
+        },
+      },
+      { $limit: DEFAULT_OFFER_COUNT },
       { $sort: { createdAt: SortType.Down } },
     ]);
   }

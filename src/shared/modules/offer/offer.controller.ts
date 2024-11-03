@@ -55,6 +55,11 @@ export class OfferController extends BaseController {
         middlewares: [new PrivateRouteMiddleware(), ...offerIdMiddlewares],
       },
       {
+        path: '/favorites',
+        handler: this.getFavorite,
+        middlewares: [new PrivateRouteMiddleware()],
+      },
+      {
         path: '/:offerId',
         handler: this.show,
         middlewares: offerIdMiddlewares,
@@ -248,4 +253,10 @@ export class OfferController extends BaseController {
   }
 
   public async getPremiumOfferByCity() {}
+
+  public async getFavorite({ tokenPayload }: Request, res: Response) {
+    const offers = await this.offerService.findFavorite(tokenPayload?.id);
+
+    this.ok(res, fillDTO(OfferRdo, offers));
+  }
 }
