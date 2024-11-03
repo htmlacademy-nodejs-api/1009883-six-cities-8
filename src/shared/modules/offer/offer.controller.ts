@@ -63,7 +63,7 @@ export class OfferController extends BaseController {
         path: '/:offerId',
         method: HttpMethod.delete,
         handler: this.delete,
-        middlewares: offerIdMiddlewares,
+        middlewares: [new PrivateRouteMiddleware(), ...offerIdMiddlewares],
       },
       {
         path: '/:offerId',
@@ -154,13 +154,25 @@ export class OfferController extends BaseController {
   }
 
   public async delete(
-    { params }: Request<ParamOfferId>,
+    { params, tokenPayload }: Request<ParamOfferId>,
     res: Response,
   ): Promise<void> {
-    const { offerId } = params;
-    const offer = await this.offerService.deleteById(offerId);
+    const offer = (await this.offerService.findById(
+      params.offerId,
+    )) as DocumentType<OfferEntity>;
 
-    this.noContent(res, offer);
+    if (!(offer.author._id.toString() === tokenPayload.id)) {
+      throw new HttpError(
+        StatusCodes.UNAUTHORIZED,
+        'Unauthorized',
+        'OfferController',
+      );
+    }
+
+    const { offerId } = params;
+    const deletedOffer = await this.offerService.deleteById(offerId);
+
+    this.noContent(res, `Offer with id ${deletedOffer?.id} was deleted`);
   }
 
   public async update(
