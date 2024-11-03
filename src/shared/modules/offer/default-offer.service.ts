@@ -58,42 +58,18 @@ export class DefaultOfferService implements OfferService {
 
   public async find(
     count = DEFAULT_OFFER_COUNT,
+    userId: string,
   ): Promise<types.DocumentType<OfferEntity>[]> {
     // return this.offerModel
     //   .find({}, {}, { limit, sort: { createdAt: SortType.Down } })
     //   .populate(['author']);
 
+    const favAggregation = getIsFavoriteAggregation(userId);
+
     return this.offerModel.aggregate([
-      {
-        $lookup: {
-          from: 'comments',
-          let: { offerId: '$_id' },
-          pipeline: [
-            { $match: { $expr: { $eq: ['$offer', '$$offerId'] } } },
-            { $project: { rating: 1 } },
-          ],
-          as: 'comments',
-        },
-      },
-      {
-        $lookup: {
-          from: 'users',
-          let: { authorId: '$author' },
-          pipeline: [{ $match: { $expr: { $eq: ['$_id', '$$authorId'] } } }],
-          as: 'authorlookup',
-        },
-      },
-      {
-        $addFields: {
-          id: { $toString: '$_id' },
-          commentsCount: { $size: '$comments' },
-          rating: { $avg: '$comments.rating' },
-          author: { $arrayElemAt: ['$authorlookup', 0] },
-        },
-      },
-      { $unset: 'comments' },
-      { $unset: 'authorlookup' },
-      { $limit: count },
+      ...generalOfferAggregation,
+      ...favAggregation,
+      { $limit: +count },
       { $sort: { createdAt: SortType.Down } },
     ]);
   }

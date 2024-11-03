@@ -15,7 +15,6 @@ import { OfferService } from './offer-service.interface.js';
 import { fillDTO } from '../../helpers/common.js';
 import { OfferRdo } from './rdo/offer.rdo.js';
 import { ParamOfferId } from './type/param-offerid.type.js';
-import { AllOffersRequest } from './type/all-offers-request.js';
 import { CreateOfferRequest } from './type/create-offer-request.type.js';
 import { UpdateOfferDto } from './dto/update-offer.dto.js';
 import { CreateOfferDto } from './dto/create-offer.dto.js';
@@ -113,8 +112,19 @@ export class OfferController extends BaseController {
     this.ok(res, fillDTO(OfferRdo, offer));
   }
 
-  public async index(req: AllOffersRequest, res: Response) {
-    const offers = await this.offerService.find(req.query.count);
+  public async index(
+    {
+      query,
+      tokenPayload,
+    }: Request<
+      Record<string, unknown>,
+      Record<string, unknown>,
+      Record<string, unknown>,
+      GetOffersQueryDto
+    >,
+    res: Response,
+  ) {
+    const offers = await this.offerService.find(query?.count, tokenPayload?.id);
 
     this.ok(res, fillDTO(OfferRdo, offers));
   }

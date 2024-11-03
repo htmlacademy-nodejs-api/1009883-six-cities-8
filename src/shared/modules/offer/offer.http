@@ -10,8 +10,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Imtla3NAa2Vrcy5uZXQiLCJuY
 # Предложения
 ## Все предложения
 
-GET http://localhost:5000/offers/ HTTP/1.1
+GET http://localhost:5000/offers HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Imtla3NAa2Vrcy5uZXQiLCJuYW1lIjoiS2VrcyIsImlkIjoiNjcxM2JmZGRiZTdiMTZjNDg5NTE2MTkwIiwiaWF0IjoxNzMwNTUwOTA3LCJleHAiOjE3MzA3MjM3MDd9.5lHV8891a-lSsDnFQgxi_YB2DgpAmrG2x6TVXuYdLdw
 
 ###
 
