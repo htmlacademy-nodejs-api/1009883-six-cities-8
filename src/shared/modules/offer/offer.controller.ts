@@ -20,6 +20,8 @@ import { CreateOfferDto } from './dto/create-offer.dto.js';
 import { GetOffersQueryDto } from './dto/get-offers-query.dto.js';
 import { StatusCodes } from 'http-status-codes';
 import { UserService } from '../user/index.js';
+import { DocumentType } from '@typegoose/typegoose';
+import { OfferEntity } from './offer.entity.js';
 
 @injectable()
 export class OfferController extends BaseController {
@@ -68,6 +70,7 @@ export class OfferController extends BaseController {
         method: HttpMethod.patch,
         handler: this.update,
         middlewares: [
+          new PrivateRouteMiddleware(),
           ...offerIdMiddlewares,
           new ValidateDtoMiddleware(UpdateOfferDto),
         ],
@@ -161,9 +164,25 @@ export class OfferController extends BaseController {
   }
 
   public async update(
-    { body, params }: Request<ParamOfferId, unknown, UpdateOfferDto>,
+    {
+      body,
+      params,
+      tokenPayload,
+    }: Request<ParamOfferId, unknown, UpdateOfferDto>,
     res: Response,
   ): Promise<void> {
+    const offer = (await this.offerService.findById(
+      params.offerId,
+    )) as DocumentType<OfferEntity>;
+
+    if (!(offer.author._id.toString() === tokenPayload.id)) {
+      throw new HttpError(
+        StatusCodes.UNAUTHORIZED,
+        'Unauthorized',
+        'OfferController',
+      );
+    }
+
     const result = await this.offerService.updateById(params.offerId, body);
     const updatedOffer = await this.offerService.findById(result?.id);
 
