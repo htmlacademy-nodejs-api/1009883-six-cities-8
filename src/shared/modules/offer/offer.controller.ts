@@ -42,7 +42,13 @@ export class OfferController extends BaseController {
       {
         path: '/:offerId/favorites',
         method: HttpMethod.post,
-        handler: this.addToFavorites,
+        handler: this.addToFavorite,
+        middlewares: [new PrivateRouteMiddleware(), ...offerIdMiddlewares],
+      },
+      {
+        path: '/:offerId/favorites',
+        method: HttpMethod.delete,
+        handler: this.removeFromFavorite,
         middlewares: [new PrivateRouteMiddleware(), ...offerIdMiddlewares],
       },
       {
@@ -119,7 +125,7 @@ export class OfferController extends BaseController {
     this.ok(res, fillDTO(OfferRdo, updatedOffer));
   }
 
-  public async addToFavorites(
+  public async addToFavorite(
     { params, tokenPayload }: Request<ParamOfferId, unknown>,
     res: Response,
   ) {
@@ -139,6 +145,29 @@ export class OfferController extends BaseController {
     this.created(
       res,
       `Offer with id "${params.offerId}" was added to favorites`,
+    );
+  }
+
+  public async removeFromFavorite(
+    { params, tokenPayload }: Request<ParamOfferId, unknown>,
+    res: Response,
+  ) {
+    const result = await this.offerService.removeFromFavorite(
+      params.offerId,
+      tokenPayload.id,
+    );
+
+    if (!result) {
+      throw new HttpError(
+        StatusCodes.BAD_REQUEST,
+        `Removing offer with id "${params.offerId}" from favorites failed`,
+        'OfferController',
+      );
+    }
+
+    this.created(
+      res,
+      `Offer with id "${params.offerId}" was removed from favorites`,
     );
   }
 

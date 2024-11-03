@@ -161,7 +161,30 @@ export class DefaultOfferService implements OfferService {
       return false;
     }
 
-    user.favorites.push(new Types.ObjectId(offerId));
+    if (!user.favorites.find((id) => id.toString() === offerId)) {
+      user.favorites.push(new Types.ObjectId(offerId));
+    }
+
+    const updatedUser = await this.userService.updateById(userId, user);
+
+    return !!updatedUser;
+  }
+
+  public async removeFromFavorite(
+    offerId: string,
+    userId: string,
+  ): Promise<boolean> {
+    const user = await this.userService.findById(userId);
+
+    if (!user) {
+      return false;
+    }
+
+    const index = user.favorites.findIndex((id) => id.toString() === offerId);
+
+    if (!(index === -1)) {
+      user.favorites.splice(index, 1);
+    }
 
     const updatedUser = await this.userService.updateById(userId, user);
 
