@@ -11,8 +11,12 @@ import {
 } from './offer.constant.js';
 import { UpdateOfferDto } from './dto/update-offer.dto.js';
 import { Cities } from '../../types/entities/cities.enum.js';
-import { PipelineStage, Types } from 'mongoose';
+import { Types } from 'mongoose';
 import { UserService } from '../user/index.js';
+import {
+  generalOfferAggregation,
+  getIsFavoriteAggregation,
+} from './helpers.js';
 
 @injectable()
 export class DefaultOfferService implements OfferService {
@@ -36,46 +40,7 @@ export class DefaultOfferService implements OfferService {
     offerId: string,
     userId?: string,
   ): Promise<types.DocumentType<OfferEntity> | null> {
-    let favAggregation: PipelineStage[] = [];
-
-    if (userId) {
-      favAggregation = [
-        {
-          $lookup: {
-            from: 'users',
-            pipeline: [
-              {
-                $match: {
-                  _id: new Types.ObjectId(userId),
-                },
-              },
-              { $project: { favorites: 1 } },
-            ],
-            as: 'currentUserLookup',
-          },
-        },
-        {
-          $addFields: {
-            currentUser: { $arrayElemAt: ['$currentUserLookup', 0] },
-          },
-        },
-        {
-          $addFields: {
-            isFavorite: { $in: ['$_id', '$currentUser.favorites'] },
-          },
-        },
-        { $unset: 'currentUserLookup' },
-        { $unset: 'currentUser' },
-      ];
-    } else {
-      favAggregation = [
-        {
-          $addFields: {
-            isFavorite: false,
-          },
-        },
-      ];
-    }
+    const favAggregation = getIsFavoriteAggregation(userId);
 
     const offerArray =
       await this.offerModel.aggregate<types.DocumentType<OfferEntity> | null>([
@@ -84,35 +49,7 @@ export class DefaultOfferService implements OfferService {
             _id: new Types.ObjectId(offerId),
           },
         },
-        {
-          $lookup: {
-            from: 'comments',
-            let: { offerId: '$_id' },
-            pipeline: [
-              { $match: { $expr: { $eq: ['$offer', '$$offerId'] } } },
-              { $project: { rating: 1 } },
-            ],
-            as: 'comments',
-          },
-        },
-        {
-          $lookup: {
-            from: 'users',
-            let: { authorId: '$author' },
-            pipeline: [{ $match: { $expr: { $eq: ['$_id', '$$authorId'] } } }],
-            as: 'authorlookup',
-          },
-        },
-        {
-          $addFields: {
-            id: { $toString: '$_id' },
-            commentsCount: { $size: '$comments' },
-            rating: { $avg: '$comments.rating' },
-            author: { $arrayElemAt: ['$authorlookup', 0] },
-          },
-        },
-        { $unset: 'comments' },
-        { $unset: 'authorlookup' },
+        ...generalOfferAggregation,
         ...favAggregation,
       ]);
 
