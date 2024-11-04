@@ -320,6 +320,26 @@ paths:
         '400':
           description: Отправлены некорректные данные (параметр city).
 
+  /offers/{offerId}/favorites:
+    post:
+      tags:
+        - offers
+      summary: Добавление в избранное.
+      description: Добавляет предложение в избранное по указанному id для авторизованного пользователя.
+
+      responses:
+        '201':
+          description: Предложение было добавлено в избраное.
+
+        '400':
+          description: Отправлены некорректные данные.
+
+        '401':
+          description: Ошибка авторизации пользователя.
+
+        '404':
+          description: Предложение с указанным id не найдено.
+
 components:
   schemas:
     createUser:
