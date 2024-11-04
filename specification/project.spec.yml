@@ -103,6 +103,13 @@ paths:
       description: Загружает изображение аватара пользователя. Изображение
         аватара должно быть в формате `png` или `jpg`.
 
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+
       requestBody:
         content:
           multipart/form-data:
