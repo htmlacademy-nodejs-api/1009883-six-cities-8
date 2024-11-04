@@ -1,0 +1,7 @@
+# Комментарии
+## Все комментарии для предложения
+
+GET http://localhost:5000/comments/66fd2589d1f647af243b2321 HTTP/1.1
+Content-Type: application/json
+
+###
