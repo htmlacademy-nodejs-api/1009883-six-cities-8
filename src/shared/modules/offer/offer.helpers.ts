@@ -69,7 +69,7 @@ export const generalOfferAggregation = [
     $addFields: {
       id: { $toString: '$_id' },
       commentsCount: { $size: '$comments' },
-      rating: { $avg: '$comments.rating' },
+      rating: { $round: [{ $avg: '$comments.rating' }, 1] },
       author: { $arrayElemAt: ['$authorlookup', 0] },
     },
   },
