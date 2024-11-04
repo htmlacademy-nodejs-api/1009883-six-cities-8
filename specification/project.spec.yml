@@ -197,6 +197,29 @@ paths:
         '404':
           description: Предложение с указанным id не найдено.
 
+    delete:
+      tags:
+        - offers
+      summary: Удаление предложения
+      description: Удаляет предложение об аренде и комментарии к нему на основе id предложения в url.
+
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '204':
+          description: Предложение и комментарии к нему были удалены.
+
+        '401':
+          description: Ошибка авторизации пользователя.
+
+        '404':
+          description: Предложение с указанным id не найдено.
+
 components:
   schemas:
     createUser:
