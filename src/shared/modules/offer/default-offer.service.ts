@@ -16,7 +16,7 @@ import { UserEntity, UserService } from '../user/index.js';
 import {
   generalOfferAggregation,
   getIsFavoriteAggregation,
-} from './helpers.js';
+} from './offer.helpers.js';
 
 @injectable()
 export class DefaultOfferService implements OfferService {
@@ -58,7 +58,7 @@ export class DefaultOfferService implements OfferService {
 
   public async find(
     count = DEFAULT_OFFER_COUNT,
-    userId: string,
+    userId?: string,
   ): Promise<types.DocumentType<OfferEntity>[]> {
     // return this.offerModel
     //   .find({}, {}, { limit, sort: { createdAt: SortType.Down } })
@@ -116,12 +116,27 @@ export class DefaultOfferService implements OfferService {
 
   public async findPremiumByCity(
     city: Cities,
+    userId?: string,
   ): Promise<types.DocumentType<OfferEntity>[]> {
-    return this.offerModel
-      .find({ city, isPremium: true })
-      .sort({ createdAt: SortType.Down })
-      .limit(DEFAULT_PREMIUM_OFFER_COUNT)
-      .populate(['author']);
+    const favAggregation = getIsFavoriteAggregation(userId);
+
+    return this.offerModel.aggregate([
+      {
+        $match: {
+          city,
+          isPremium: true,
+        },
+      },
+      ...generalOfferAggregation,
+      ...favAggregation,
+      { $limit: DEFAULT_PREMIUM_OFFER_COUNT },
+      { $sort: { createdAt: SortType.Down } },
+    ]);
+    // return this.offerModel
+    //   .find({ city, isPremium: true })
+    //   .sort({ createdAt: SortType.Down })
+    //   .limit(DEFAULT_PREMIUM_OFFER_COUNT)
+    //   .populate(['author']);
   }
 
   public async exists(documentId: string): Promise<boolean> {

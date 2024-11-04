@@ -22,6 +22,8 @@ import { StatusCodes } from 'http-status-codes';
 import { UserService } from '../user/index.js';
 import { DocumentType } from '@typegoose/typegoose';
 import { OfferEntity } from './offer.entity.js';
+import { Cities } from '../../types/entities/index.js';
+import { ParamCity } from './type/param-city.type.js';
 
 @injectable()
 export class OfferController extends BaseController {
@@ -42,6 +44,10 @@ export class OfferController extends BaseController {
     ];
 
     this.addRoutes([
+      {
+        path: '/premium/:city',
+        handler: this.getPremiumOfferByCity,
+      },
       {
         path: '/:offerId/favorites',
         method: HttpMethod.post,
@@ -229,6 +235,26 @@ export class OfferController extends BaseController {
     );
   }
 
+  public async getPremiumOfferByCity(
+    { params, tokenPayload }: Request<ParamCity>,
+    res: Response,
+  ) {
+    if (!Object.values(Cities).includes(params?.city as Cities)) {
+      throw new HttpError(
+        StatusCodes.BAD_REQUEST,
+        `The city ${params.city} is not supported`,
+        'OfferController',
+      );
+    }
+
+    const offers = await this.offerService.findPremiumByCity(
+      params?.city as Cities,
+      tokenPayload?.id,
+    );
+
+    this.ok(res, fillDTO(OfferRdo, offers));
+  }
+
   public async removeFromFavorite(
     { params, tokenPayload }: Request<ParamOfferId, unknown>,
     res: Response,
@@ -251,8 +277,6 @@ export class OfferController extends BaseController {
       `Offer with id "${params.offerId}" was removed from favorites`,
     );
   }
-
-  public async getPremiumOfferByCity() {}
 
   public async getFavorite({ tokenPayload }: Request, res: Response) {
     const offers = await this.offerService.findFavorite(tokenPayload?.id);
