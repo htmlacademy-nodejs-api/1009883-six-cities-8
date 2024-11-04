@@ -389,6 +389,44 @@ paths:
         '404':
           description: Предложение с указанным id не найдено.
 
+    post:
+      tags:
+        - comments
+      summary: Добавление комментария.
+      description: Добавляет комментарий по id предложения в параметре и на основе данных в теле запроса. Для авторизованного пользователя.
+
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            type: string
+
+      requestBody:
+        description: Информация для добавления комментария.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createComment'
+        required: true
+
+      responses:
+        '201':
+          description: Комментарий был создан.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/comment'
+
+        '400':
+          description: Отправлены некорректные данные.
+
+        '401':
+          description: Ошибка авторизации.
+
+        '404':
+          description: Предложение с указанным id не найдено.
+
 components:
   schemas:
     createUser:
@@ -789,3 +827,18 @@ components:
         createdAt:
           type: string
           example: '2022-04-06T08:45:40.283Z'
+
+    createComment:
+      type: object
+      required:
+        - text
+        - rating
+
+      properties:
+        text:
+          type: string
+          example: Текст комментария
+
+        rating:
+          type: number
+          example: 4
