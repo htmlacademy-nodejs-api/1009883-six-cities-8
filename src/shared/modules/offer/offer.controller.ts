@@ -24,6 +24,7 @@ import { DocumentType } from '@typegoose/typegoose';
 import { OfferEntity } from './offer.entity.js';
 import { Cities } from '../../types/entities/index.js';
 import { ParamCity } from './type/param-city.type.js';
+import { CommentService } from '../comment/index.js';
 
 @injectable()
 export class OfferController extends BaseController {
@@ -33,6 +34,8 @@ export class OfferController extends BaseController {
     protected readonly offerService: OfferService,
     @inject(Component.UserService)
     protected readonly userService: UserService,
+    @inject(Component.CommentService)
+    protected readonly commentService: CommentService,
   ) {
     super(logger);
 
@@ -182,6 +185,8 @@ export class OfferController extends BaseController {
 
     const { offerId } = params;
     const deletedOffer = await this.offerService.deleteById(offerId);
+
+    await this.commentService.deleteByOfferId(offerId);
 
     this.noContent(res, `Offer with id ${deletedOffer?.id} was deleted`);
   }

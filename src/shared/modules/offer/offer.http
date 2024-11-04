@@ -39,7 +39,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Imtla3NAa2Vrcy5uZXQiLCJuY
 # Предложения
 ## Удалить предложение
 
-DELETE  http://localhost:5000/offers/672779aac2a979af66ad6fb8 HTTP/1.1
+DELETE  http://localhost:5000/offers/6728b117e4382d65f71ad65a HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Imtla3NAa2Vrcy5uZXQiLCJuYW1lIjoiS2VrcyIsImlkIjoiNjcxM2JmZGRiZTdiMTZjNDg5NTE2MTkwIiwiaWF0IjoxNzMwNzE0NjEzLCJleHAiOjE3MzA4ODc0MTN9.7Om33pMEEId1vu9lyP8TB4b1Ou8-XVjsDOXAAbhONwY
 
