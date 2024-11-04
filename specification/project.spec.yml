@@ -293,6 +293,33 @@ paths:
         '401':
           description: Ошибка авторизации пользователя.
 
+  /offers/premium/{city}:
+    get:
+      tags:
+        - offers
+      summary: Премиальные предложения по городу.
+      description: Выдаёт до трёх премиальных предложений соответствующих указанному в параметре городу.
+
+      parameters:
+        - name: city
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/cities'
+
+      responses:
+        '200':
+          description: В теле ответа информация о найденных предложениях.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/offer'
+
+        '400':
+          description: Отправлены некорректные данные (параметр city).
+
 components:
   schemas:
     createUser:
