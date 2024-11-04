@@ -159,6 +159,33 @@ paths:
           description: Отправлены некорректные данные.
 
   /offers/{offerId}:
+    get:
+      tags:
+        - offers
+      summary: Поиск предложения по id
+      description: Выдаёт предложение об аренде на основе id предложения в url.
+
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Предложение найдено. В теле ответа информация о предложении.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offer'
+
+        '400':
+          description: Отправлены некорректные данные.
+
+        '404':
+          description: Предложение с указанным id не найдено.
+
     patch:
       tags:
         - offers
