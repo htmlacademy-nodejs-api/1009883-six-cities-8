@@ -359,6 +359,36 @@ paths:
         '404':
           description: Предложение с указанным id не найдено.
 
+  /comments/{offerId}:
+    get:
+      tags:
+        - comments
+      summary: Получение комментариев.
+      description: Выдаёт комментарии к предложению по id предложения в параметре.
+
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Найденные комментарии.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/comment'
+
+        '400':
+          description: Отправлены некорректные данные.
+
+        '404':
+          description: Предложение с указанным id не найдено.
+
 components:
   schemas:
     createUser:
@@ -735,3 +765,27 @@ components:
           - Washer
           - Towels
           - Fridge
+
+    comment:
+      type: object
+      required:
+        - text
+        - rating
+        - author
+        - createdAt
+
+      properties:
+        text:
+          type: string
+          example: Текст комментария
+
+        rating:
+          type: number
+          example: 4
+
+        author:
+          $ref: '#/components/schemas/user'
+
+        createdAt:
+          type: string
+          example: '2022-04-06T08:45:40.283Z'
