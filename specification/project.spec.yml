@@ -73,6 +73,9 @@ paths:
         '401':
           description: Неверный email или пароль.
 
+        '400':
+          description: Ошибка валидации данных пользователя. В ответе объект с ошибками.
+
     get:
       tags:
         - users
@@ -223,9 +226,13 @@ components:
     token:
       type: object
       properties:
+        email:
+          type: string
+          example: keks@htmlacademy.ru
+
         token:
           type: string
-          example: 6329c3d6a04ab1061c6425ea
+          example: eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Imtla3NAa2Vrcy5uZXQiLCJuYW1lIjoiS2VrcyIsImlkIjoiNjcxM2JmZGRiZTdiMTZjNDg5NTE2MTkwIiwiaWF0IjoxNzMwNzE0NjEzLCJleHAiOjE3MzA4ODc0MTN9.7Om33pMEEId1vu9lyP8TB4b1Ou8-XVjsDOXAAbhONwY
 
     createOffer:
       type: object
