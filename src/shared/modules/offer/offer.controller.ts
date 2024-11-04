@@ -277,7 +277,7 @@ export class OfferController extends BaseController {
       );
     }
 
-    this.created(
+    this.noContent(
       res,
       `Offer with id "${params.offerId}" was removed from favorites`,
     );
