@@ -132,7 +132,7 @@ paths:
                     type: string
                     example: /keks.png
 
-  /offers/add:
+  /offers:
     post:
       tags:
         - offers
@@ -186,6 +186,11 @@ components:
 
     user:
       type: object
+      required:
+        - id
+        - email
+        - name
+        - type
 
       properties:
         id:
@@ -240,7 +245,6 @@ components:
         - city
         - preview
         - photos
-        - isPremium
         - housingType
         - roomsNumber
         - guestsNumber
@@ -309,9 +313,22 @@ components:
         facilities:
           $ref: '#/components/schemas/facilities'
 
+        latitude:
+          type: number
+          example: 53.550341
+          minimum: -90
+          maximum: 90
+
+        longitude:
+          type: number
+          example: 10.000654
+          minimum: -180
+          maximum: 180
+
     offer:
       type: object
       required:
+        - id
         - title
         - description
         - createdAt
