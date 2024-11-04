@@ -93,17 +93,6 @@ paths:
         '401':
           description: Пользователь не аутентифицирован.
 
-  /users/logout:
-    get:
-      tags:
-        - users
-      summary: Логаут пользователя
-      description: Реализует выход пользователя из приложения
-
-      responses:
-        '204':
-          description: Пользователь вышел из приложения.
-
   /users/{userId}/avatar:
     post:
       tags:
