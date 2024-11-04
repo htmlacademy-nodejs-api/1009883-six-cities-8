@@ -158,6 +158,45 @@ paths:
         '400':
           description: Отправлены некорректные данные.
 
+  /offers/{offerId}:
+    patch:
+      tags:
+        - offers
+      summary: Редактирование предложения
+      description: Создаёт предложение об аренде на основе id предложения в url и данных в теле запроса.
+
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            type: string
+
+      requestBody:
+        description: Информация для редактирования предложения.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/editOffer'
+        required: true
+
+      responses:
+        '201':
+          description: Предложение об аренде создано. В теле ответа информация о новом предложении.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offer'
+
+        '400':
+          description: Отправлены некорректные данные.
+
+        '401':
+          description: Ошибка авторизации пользователя.
+
+        '404':
+          description: Предложение с указанным id не найдено.
+
 components:
   schemas:
     createUser:
@@ -252,6 +291,81 @@ components:
         - facilities
         - latitude
         - longitude
+
+      properties:
+        title:
+          type: string
+          example: 'Hotel California'
+          minLength: 10
+          maxLength: 100
+
+        description:
+          type: string
+          example: 'Such a lovely place'
+          minLength: 20
+          maxLength: 1024
+
+        city:
+          $ref: '#/components/schemas/cities'
+
+        preview:
+          type: string
+          example: hotel.jpg
+
+        photos:
+          type: array
+          items:
+            type: string
+          example:
+            - photo1.jpg
+            - photo2.jpg
+            - photo3.jpg
+            - photo4.jpg
+            - photo5.jpg
+            - photo6.jpg
+
+        isPremium:
+          type: boolean
+          example: true
+
+        housingType:
+          $ref: '#/components/schemas/housingType'
+
+        roomsNumber:
+          type: integer
+          example: 4
+          minimum: 1
+          maximum: 8
+
+        guestsNumber:
+          type: integer
+          example: 4
+          minimum: 1
+          maximum: 10
+
+        price:
+          type: integer
+          example: 10000
+          minimum: 100
+          maximum: 100000
+
+        facilities:
+          $ref: '#/components/schemas/facilities'
+
+        latitude:
+          type: number
+          example: 53.550341
+          minimum: -90
+          maximum: 90
+
+        longitude:
+          type: number
+          example: 10.000654
+          minimum: -180
+          maximum: 180
+
+    editOffer:
+      type: object
 
       properties:
         title:
