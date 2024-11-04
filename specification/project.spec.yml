@@ -273,6 +273,26 @@ paths:
         '404':
           description: Предложение с указанным id не найдено.
 
+  /offers/favorites:
+    get:
+      tags:
+        - offers
+      summary: Избранные предложения.
+      description: Выдаёт избранные предложения для авторизованного пользователя.
+
+      responses:
+        '200':
+          description: В теле ответа информация о найденных предложениях.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/offer'
+
+        '401':
+          description: Ошибка авторизации пользователя.
+
 components:
   schemas:
     createUser:
