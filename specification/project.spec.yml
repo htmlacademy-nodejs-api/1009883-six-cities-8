@@ -41,6 +41,12 @@ paths:
         '409':
           description: Пользователь с таким email уже существует.
 
+        '401':
+          description: Создать аккаунт могут только анонимные пользователи.
+
+        '400':
+          description: Ошибка валидации данных пользователя. В ответе объект с ошибками.
+
   /users/login:
     post:
       tags:
@@ -173,6 +179,10 @@ components:
           type: string
           example: 123456
 
+        avatarPath:
+          type: string
+          example: keks.png
+
     user:
       type: object
 
@@ -188,6 +198,12 @@ components:
         name:
           type: string
           example: 'Keks'
+
+        type:
+          type: string
+          enum:
+            - Regular
+            - Pro
 
     login:
       type: object
