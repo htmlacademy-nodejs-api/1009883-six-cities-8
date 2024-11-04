@@ -133,6 +133,32 @@ paths:
                     example: /keks.png
 
   /offers:
+    get:
+      tags:
+        - offers
+      summary: Все предложения
+      description: Выдаёт массив последних предложений. Максимальный размер берётся из значения по умолчанию или из query параметра.
+
+      parameters:
+        - name: count
+          in: query
+          required: false
+          schema:
+            type: integer
+
+      responses:
+        '200':
+          description: В теле ответа информация о найденных предложениях.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/offer'
+
+        '400':
+          description: Отправлены некорректные данные (query параметр count).
+
     post:
       tags:
         - offers
