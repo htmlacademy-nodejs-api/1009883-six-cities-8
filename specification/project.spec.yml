@@ -327,6 +327,13 @@ paths:
       summary: Добавление в избранное.
       description: Добавляет предложение в избранное по указанному id для авторизованного пользователя.
 
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            type: string
+
       responses:
         '201':
           description: Предложение было добавлено в избранное.
@@ -345,6 +352,13 @@ paths:
         - offers
       summary: Удаление из избранного.
       description: Удаляет предложение из избранного по указанному id для авторизованного пользователя.
+
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            type: string
 
       responses:
         '204':
