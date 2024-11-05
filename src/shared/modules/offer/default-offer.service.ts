@@ -60,10 +60,6 @@ export class DefaultOfferService implements OfferService {
     count = DEFAULT_OFFER_COUNT,
     userId?: string,
   ): Promise<types.DocumentType<OfferEntity>[]> {
-    // return this.offerModel
-    //   .find({}, {}, { limit, sort: { createdAt: SortType.Down } })
-    //   .populate(['author']);
-
     const favAggregation = getIsFavoriteAggregation(userId);
 
     return this.offerModel.aggregate([
@@ -82,11 +78,6 @@ export class DefaultOfferService implements OfferService {
     )) as types.DocumentType<UserEntity>;
 
     return this.offerModel.aggregate([
-      // {
-      //   $addFields: {
-      //     currentUser: currentUser,
-      //   },
-      // },
       { $match: { $expr: { $in: ['$_id', currentUser.favorites] } } },
       ...generalOfferAggregation,
       {
@@ -132,11 +123,6 @@ export class DefaultOfferService implements OfferService {
       { $limit: DEFAULT_PREMIUM_OFFER_COUNT },
       { $sort: { createdAt: SortType.Down } },
     ]);
-    // return this.offerModel
-    //   .find({ city, isPremium: true })
-    //   .sort({ createdAt: SortType.Down })
-    //   .limit(DEFAULT_PREMIUM_OFFER_COUNT)
-    //   .populate(['author']);
   }
 
   public async exists(documentId: string): Promise<boolean> {

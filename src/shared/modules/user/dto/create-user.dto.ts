@@ -18,9 +18,6 @@ export class CreateUserDto {
   @Expose()
   public avatarPath?: string;
 
-  // @IsEnum(UserType, {
-  //   message: CreateUserMessages.type.invalid,
-  // })
   public type: UserType;
 
   @IsString({ message: CreateUserMessages.password.invalidFormat })

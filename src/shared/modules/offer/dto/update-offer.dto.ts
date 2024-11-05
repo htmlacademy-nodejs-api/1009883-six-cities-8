@@ -75,8 +75,6 @@ export class UpdateOfferDto {
   @Expose()
   isPremium?: boolean;
 
-  // rating?: number;
-
   @IsOptional()
   @IsEnum(HousingType, {
     message: UpdateOfferValidationMessage.housingType.invalid,

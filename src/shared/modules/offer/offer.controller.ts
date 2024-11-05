@@ -114,20 +114,6 @@ export class OfferController extends BaseController {
 
     const offer = await this.offerService.findById(offerId, tokenPayload?.id);
 
-    // if (offer) {
-    //   offer.isFavorite = false;
-
-    //   if (tokenPayload) {
-    //     const user = await this.userService.findById(tokenPayload.id);
-
-    //     if (user) {
-    //       offer.isFavorite =
-    //         user.favorites.findIndex((fav) => fav.toString() === offer.id) !==
-    //         -1;
-    //     }
-    //   }
-    // }
-
     this.ok(res, fillDTO(OfferRdo, offer));
   }
 

@@ -4,7 +4,6 @@ import {
   IsDateString,
   IsEnum,
   IsInt,
-  // IsMongoId,
   IsNumber,
   IsOptional,
   IsString,
@@ -70,8 +69,6 @@ export class CreateOfferDto {
   @Expose()
   isPremium: boolean;
 
-  // rating: number;
-
   @IsEnum(HousingType, {
     message: CreateOfferValidationMessage.housingType.invalid,
   })
@@ -104,7 +101,6 @@ export class CreateOfferDto {
   @Expose()
   facilities: Facilities[];
 
-  // @IsMongoId({ message: CreateOfferValidationMessage.author.invalidId })
   author: string;
 
   @IsNumber(

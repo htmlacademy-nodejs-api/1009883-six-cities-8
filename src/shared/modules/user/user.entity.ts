@@ -3,11 +3,9 @@ import {
   getModelForClass,
   modelOptions,
   prop,
-  // Ref,
 } from '@typegoose/typegoose';
 import { User, UserType } from '../../types/entities/index.js';
 import { createSHA256 } from '../../helpers/index.js';
-// import { OfferEntity } from '../offer/index.js';
 import { Types } from 'mongoose';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
