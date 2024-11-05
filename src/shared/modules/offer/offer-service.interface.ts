@@ -7,15 +7,22 @@ import { DocumentExists } from '../../types/index.js';
 
 export interface OfferService extends DocumentExists {
   create(dto: CreateOfferDto): Promise<DocumentType<OfferEntity>>;
-  findById(offerId: string): Promise<DocumentType<OfferEntity> | null>;
-  find(count?: number): Promise<DocumentType<OfferEntity>[]>;
+  findById(
+    offerId: string,
+    userId?: string,
+  ): Promise<DocumentType<OfferEntity> | null>;
+  find(count?: number, userId?: string): Promise<DocumentType<OfferEntity>[]>;
   deleteById(offerId: string): Promise<DocumentType<OfferEntity> | null>;
   updateById(
     offerId: string,
     dto: UpdateOfferDto,
   ): Promise<DocumentType<OfferEntity> | null>;
-  findPremiumByCity(city: Cities): Promise<DocumentType<OfferEntity>[]>;
+  findPremiumByCity(
+    city: Cities,
+    userId?: string,
+  ): Promise<DocumentType<OfferEntity>[]>;
   exists(documentId: string): Promise<boolean>;
-  // TODO
-  // findFavorite(): Promise<DocumentType<OfferEntity>[]>;
+  addToFavorite(offerId: string, userId: string): Promise<boolean>;
+  removeFromFavorite(offerId: string, userId: string): Promise<boolean>;
+  findFavorite(userId: string): Promise<DocumentType<OfferEntity>[]>;
 }

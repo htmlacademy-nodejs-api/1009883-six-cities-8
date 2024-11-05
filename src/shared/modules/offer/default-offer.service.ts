@@ -12,6 +12,11 @@ import {
 import { UpdateOfferDto } from './dto/update-offer.dto.js';
 import { Cities } from '../../types/entities/cities.enum.js';
 import { Types } from 'mongoose';
+import { UserEntity, UserService } from '../user/index.js';
+import {
+  generalOfferAggregation,
+  getIsFavoriteAggregation,
+} from './offer.helpers.js';
 
 @injectable()
 export class DefaultOfferService implements OfferService {
@@ -19,6 +24,7 @@ export class DefaultOfferService implements OfferService {
     @inject(Component.Logger) private readonly logger: Logger,
     @inject(Component.OfferModel)
     private readonly offerModel: types.ModelType<OfferEntity>,
+    @inject(Component.UserService) private readonly userService: UserService,
   ) {}
 
   public async create(
@@ -32,8 +38,9 @@ export class DefaultOfferService implements OfferService {
 
   public async findById(
     offerId: string,
+    userId?: string,
   ): Promise<types.DocumentType<OfferEntity> | null> {
-    // return this.offerModel.findById(offerId).populate(['author']);
+    const favAggregation = getIsFavoriteAggregation(userId);
 
     const offerArray =
       await this.offerModel.aggregate<types.DocumentType<OfferEntity> | null>([
@@ -42,35 +49,8 @@ export class DefaultOfferService implements OfferService {
             _id: new Types.ObjectId(offerId),
           },
         },
-        {
-          $lookup: {
-            from: 'comments',
-            let: { offerId: '$_id' },
-            pipeline: [
-              { $match: { $expr: { $eq: ['$offer', '$$offerId'] } } },
-              { $project: { rating: 1 } },
-            ],
-            as: 'comments',
-          },
-        },
-        {
-          $lookup: {
-            from: 'users',
-            let: { authorId: '$author' },
-            pipeline: [{ $match: { $expr: { $eq: ['$_id', '$$authorId'] } } }],
-            as: 'authorlookup',
-          },
-        },
-        {
-          $addFields: {
-            id: { $toString: '$_id' },
-            commentsCount: { $size: '$comments' },
-            rating: { $avg: '$comments.rating' },
-            author: { $arrayElemAt: ['$authorlookup', 0] },
-          },
-        },
-        { $unset: 'comments' },
-        { $unset: 'authorlookup' },
+        ...generalOfferAggregation,
+        ...favAggregation,
       ]);
 
     return offerArray[0];
@@ -78,42 +58,34 @@ export class DefaultOfferService implements OfferService {
 
   public async find(
     count = DEFAULT_OFFER_COUNT,
+    userId?: string,
   ): Promise<types.DocumentType<OfferEntity>[]> {
-    // return this.offerModel
-    //   .find({}, {}, { limit, sort: { createdAt: SortType.Down } })
-    //   .populate(['author']);
+    const favAggregation = getIsFavoriteAggregation(userId);
 
     return this.offerModel.aggregate([
-      {
-        $lookup: {
-          from: 'comments',
-          let: { offerId: '$_id' },
-          pipeline: [
-            { $match: { $expr: { $eq: ['$offer', '$$offerId'] } } },
-            { $project: { rating: 1 } },
-          ],
-          as: 'comments',
-        },
-      },
-      {
-        $lookup: {
-          from: 'users',
-          let: { authorId: '$author' },
-          pipeline: [{ $match: { $expr: { $eq: ['$_id', '$$authorId'] } } }],
-          as: 'authorlookup',
-        },
-      },
+      ...generalOfferAggregation,
+      ...favAggregation,
+      { $limit: count },
+      { $sort: { createdAt: SortType.Down } },
+    ]);
+  }
+
+  public async findFavorite(
+    userId: string,
+  ): Promise<types.DocumentType<OfferEntity>[]> {
+    const currentUser = (await this.userService.findById(
+      userId,
+    )) as types.DocumentType<UserEntity>;
+
+    return this.offerModel.aggregate([
+      { $match: { $expr: { $in: ['$_id', currentUser.favorites] } } },
+      ...generalOfferAggregation,
       {
         $addFields: {
-          id: { $toString: '$_id' },
-          commentsCount: { $size: '$comments' },
-          rating: { $avg: '$comments.rating' },
-          author: { $arrayElemAt: ['$authorlookup', 0] },
+          isFavorite: true,
         },
       },
-      { $unset: 'comments' },
-      { $unset: 'authorlookup' },
-      { $limit: count },
+      { $limit: DEFAULT_OFFER_COUNT },
       { $sort: { createdAt: SortType.Down } },
     ]);
   }
@@ -135,17 +107,67 @@ export class DefaultOfferService implements OfferService {
 
   public async findPremiumByCity(
     city: Cities,
+    userId?: string,
   ): Promise<types.DocumentType<OfferEntity>[]> {
-    return this.offerModel
-      .find({ city, isPremium: true })
-      .sort({ createdAt: SortType.Down })
-      .limit(DEFAULT_PREMIUM_OFFER_COUNT)
-      .populate(['author']);
+    const favAggregation = getIsFavoriteAggregation(userId);
+
+    return this.offerModel.aggregate([
+      {
+        $match: {
+          city,
+          isPremium: true,
+        },
+      },
+      ...generalOfferAggregation,
+      ...favAggregation,
+      { $limit: DEFAULT_PREMIUM_OFFER_COUNT },
+      { $sort: { createdAt: SortType.Down } },
+    ]);
   }
 
   public async exists(documentId: string): Promise<boolean> {
     const offerExists = await this.offerModel.exists({ _id: documentId });
 
     return offerExists !== null;
+  }
+
+  public async addToFavorite(
+    offerId: string,
+    userId: string,
+  ): Promise<boolean> {
+    const user = await this.userService.findById(userId);
+
+    if (!user) {
+      return false;
+    }
+
+    if (!user.favorites.find((id) => id.toString() === offerId)) {
+      user.favorites.push(new Types.ObjectId(offerId));
+    }
+
+    const updatedUser = await this.userService.updateById(userId, user);
+
+    return !!updatedUser;
+  }
+
+  public async removeFromFavorite(
+    offerId: string,
+    userId: string,
+  ): Promise<boolean> {
+    const user = await this.userService.findById(userId);
+
+    if (!user) {
+      return false;
+    }
+
+    const index = user.favorites.findIndex((id) => id.toString() === offerId);
+
+    if (!(index === -1)) {
+      user.favorites.splice(index, 1);
+    }
+
+    const updatedUser = await this.userService.updateById(userId, user);
+
+    return !!updatedUser;
   }
 }

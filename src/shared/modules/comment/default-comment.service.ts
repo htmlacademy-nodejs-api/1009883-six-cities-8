@@ -25,6 +25,7 @@ export class DefaultCommentService implements CommentService {
   ): Promise<types.DocumentType<CommentEntity>[]> {
     return this.commentModel
       .find({ offer: offerId })
+      .populate('author')
       .sort({ createdAt: SortType.Down })
       .limit(DEFAULT_COMMENT_COUNT);
   }

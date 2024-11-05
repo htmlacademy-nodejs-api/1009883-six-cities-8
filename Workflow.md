@@ -10,6 +10,18 @@ npm install
 
 Команда запустит процесс установки зависимостей проекта из **npm**.
 
+### Переменные окружения
+
+PORT=5000 - Порт нашего api приложения на Node.js
+SALT=asdf - Соль используемая при хешировании паролей
+DB_HOST=127.0.0.1 - ip базы данных
+DB_USER=Admin - Юзер базы данных
+DB_PASSWORD=test - Пароль к базе данных
+DB_PORT=27017 - Порт базы данных
+DB_NAME=six-cities - Имя базы данных
+UPLOAD_DIRECTORY=/home/node/app/upload - Директория для загрузки файлов
+JWT_SECRET=secret - Секрет используемый при формировании jwt токенов.
+
 ### Сценарии
 
 В `package.json` предопределено несколько сценариев.
@@ -71,6 +83,26 @@ npm start
 ```bash
 npm run mock:server
 ```
+
+#### CLI команды-сокращения
+
+Для удобства работы с CLI частью проекта были созданы следующие сокращения:
+
+"cli:version": "npm run ts ./src/main.cli.ts -- --version",
+"cli:help": "npm run ts ./src/main.cli.ts -- --help",
+"cli:import": "npm run ts ./src/main.cli.ts -- --import ./mocks/test-data/test-data.tsv mongodb://Admin:test@127.0.0.1:27017/six-citieauthSource=admin salt",
+"cli:import:docker": "npm run ts ./src/main.cli.ts -- --import ./mocks/test-data/test-data.tsv mongodb://Admin:test@db:27017/six-citieauthSource=admin salt",
+"cli:generate": "npm run ts ./src/main.cli.ts -- --generate 10 ./mocks/test-data/test-data.tsv http://localhost:3123/api",
+
+Запускаются как обычно: npm run имя_команды.
+
+## Запуск проекта
+
+Необходимо чтобы были установлены Node.js и docker.
+
+Для запуска БД надо использовать команду "docker-compose up -d" в корне проекта.
+
+!!! Важно: Проект разрабатывался целиком с использованием докера, даже для Node.js, и если его использовать с использованием Node.js вне докера, то предаварительно в настройках docker-compose.yml файла стоит закомментировать часть где описываются настройки для контейнера Node.js. Так как там экспозятся порты которые будет использовать приложение на Node.js. В ином случае, возможно это может стать проблемой.
 
 ## Структура проекта
 
