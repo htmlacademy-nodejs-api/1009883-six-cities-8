@@ -6,6 +6,7 @@ import {
   HttpError,
   HttpMethod,
   PrivateRouteMiddleware,
+  ValidateCityQueryMiddleware,
   ValidateDtoMiddleware,
   ValidateObjectIdMiddleware,
 } from '../../libs/rest/index.js';
@@ -20,11 +21,10 @@ import { CreateOfferDto } from './dto/create-offer.dto.js';
 import { GetOffersQueryDto } from './dto/get-offers-query.dto.js';
 import { StatusCodes } from 'http-status-codes';
 import { UserService } from '../user/index.js';
-import { DocumentType } from '@typegoose/typegoose';
-import { OfferEntity } from './offer.entity.js';
 import { Cities } from '../../types/entities/index.js';
 import { ParamCity } from './type/param-city.type.js';
 import { CommentService } from '../comment/index.js';
+import { OwnOfferMiddleware } from '../../libs/rest/middleware/own-offer.middleware.js';
 
 @injectable()
 export class OfferController extends BaseController {
@@ -50,6 +50,7 @@ export class OfferController extends BaseController {
       {
         path: '/premium/:city',
         handler: this.getPremiumOfferByCity,
+        middlewares: [new ValidateCityQueryMiddleware()],
       },
       {
         path: '/:offerId/favorites',
@@ -77,7 +78,11 @@ export class OfferController extends BaseController {
         path: '/:offerId',
         method: HttpMethod.delete,
         handler: this.delete,
-        middlewares: [new PrivateRouteMiddleware(), ...offerIdMiddlewares],
+        middlewares: [
+          new PrivateRouteMiddleware(),
+          ...offerIdMiddlewares,
+          new OwnOfferMiddleware(this.offerService),
+        ],
       },
       {
         path: '/:offerId',
@@ -86,6 +91,7 @@ export class OfferController extends BaseController {
         middlewares: [
           new PrivateRouteMiddleware(),
           ...offerIdMiddlewares,
+          new OwnOfferMiddleware(this.offerService),
           new ValidateDtoMiddleware(UpdateOfferDto),
         ],
       },
@@ -154,49 +160,22 @@ export class OfferController extends BaseController {
   }
 
   public async delete(
-    { params, tokenPayload }: Request<ParamOfferId>,
+    { params }: Request<ParamOfferId>,
     res: Response,
   ): Promise<void> {
-    const offer = (await this.offerService.findById(
-      params.offerId,
-    )) as DocumentType<OfferEntity>;
-
-    if (!(offer.author._id.toString() === tokenPayload.id)) {
-      throw new HttpError(
-        StatusCodes.UNAUTHORIZED,
-        'Unauthorized',
-        'OfferController',
-      );
-    }
-
     const { offerId } = params;
-    const deletedOffer = await this.offerService.deleteById(offerId);
-
-    await this.commentService.deleteByOfferId(offerId);
+    const [deletedOffer] = await Promise.all([
+      this.offerService.deleteById(offerId),
+      this.commentService.deleteByOfferId(offerId),
+    ]);
 
     this.noContent(res, `Offer with id ${deletedOffer?.id} was deleted`);
   }
 
   public async update(
-    {
-      body,
-      params,
-      tokenPayload,
-    }: Request<ParamOfferId, unknown, UpdateOfferDto>,
+    { body, params }: Request<ParamOfferId, unknown, UpdateOfferDto>,
     res: Response,
   ): Promise<void> {
-    const offer = (await this.offerService.findById(
-      params.offerId,
-    )) as DocumentType<OfferEntity>;
-
-    if (!(offer.author._id.toString() === tokenPayload.id)) {
-      throw new HttpError(
-        StatusCodes.UNAUTHORIZED,
-        'Unauthorized',
-        'OfferController',
-      );
-    }
-
     const result = await this.offerService.updateById(params.offerId, body);
     const updatedOffer = await this.offerService.findById(result?.id);
 
@@ -230,14 +209,6 @@ export class OfferController extends BaseController {
     { params, tokenPayload }: Request<ParamCity>,
     res: Response,
   ) {
-    if (!Object.values(Cities).includes(params?.city as Cities)) {
-      throw new HttpError(
-        StatusCodes.BAD_REQUEST,
-        `The city ${params.city} is not supported`,
-        'OfferController',
-      );
-    }
-
     const offers = await this.offerService.findPremiumByCity(
       params?.city as Cities,
       tokenPayload?.id,

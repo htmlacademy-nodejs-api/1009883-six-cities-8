@@ -60,8 +60,6 @@ export class OfferEntity extends defaultClasses.TimeStamps {
 
   @prop({ required: true })
   public longitude: number;
-
-  public isFavorite: boolean;
 }
 
 export const OfferModel = getModelForClass(OfferEntity);

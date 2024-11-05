@@ -13,3 +13,4 @@ export { DocumentExistsMiddleware } from './middleware/document-exists.middlewar
 export { UploadFileMiddleware } from './middleware/upload-file.middleware.js';
 export { ParseTokenMiddleware } from './middleware/parse-token.middleware.js';
 export { PrivateRouteMiddleware } from './middleware/private-route.middleware.js';
+export { ValidateCityQueryMiddleware } from './middleware/validate-city-query.middlware.js';

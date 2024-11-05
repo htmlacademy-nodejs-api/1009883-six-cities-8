@@ -91,7 +91,7 @@ export class ImportCommand implements Command {
 
     this.salt = salt;
 
-    this.databaseClient.connect(mongoUri);
+    await this.databaseClient.connect(mongoUri);
 
     const fileReader = new TSVOfferFileReader(filename.trim());
 

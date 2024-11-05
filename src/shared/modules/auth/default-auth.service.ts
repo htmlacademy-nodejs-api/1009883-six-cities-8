@@ -5,7 +5,7 @@ import { Component } from '../../types/index.js';
 import { Logger } from '../../libs/logger/index.js';
 import { LoginUserDto, UserEntity, UserService } from '../user/index.js';
 import { Config, RestSchema } from '../../libs/config/index.js';
-import { TokenPayload } from './types/TokenPayload.js';
+import { TokenPayload } from './types/token-payload.js';
 import { SignJWT } from 'jose';
 import { JWT_ALGORITHM, JWT_EXPIRED } from './auth.constant.js';
 import { AuthIncorrectException } from './errors/index.js';
