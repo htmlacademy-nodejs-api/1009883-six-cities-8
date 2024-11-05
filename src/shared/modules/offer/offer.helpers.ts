@@ -1,39 +1,8 @@
-import { PipelineStage, Types } from 'mongoose';
+import { Types } from 'mongoose';
 
 export function getIsFavoriteAggregation(userId?: string) {
-  let favAggregation: PipelineStage[] = [];
-
-  if (userId) {
-    favAggregation = [
-      {
-        $lookup: {
-          from: 'users',
-          pipeline: [
-            {
-              $match: {
-                _id: new Types.ObjectId(userId),
-              },
-            },
-            { $project: { favorites: 1 } },
-          ],
-          as: 'currentUserLookup',
-        },
-      },
-      {
-        $addFields: {
-          currentUser: { $arrayElemAt: ['$currentUserLookup', 0] },
-        },
-      },
-      {
-        $addFields: {
-          isFavorite: { $in: ['$_id', '$currentUser.favorites'] },
-        },
-      },
-      { $unset: 'currentUserLookup' },
-      { $unset: 'currentUser' },
-    ];
-  } else {
-    favAggregation = [
+  if (!userId) {
+    return [
       {
         $addFields: {
           isFavorite: false,
@@ -42,7 +11,34 @@ export function getIsFavoriteAggregation(userId?: string) {
     ];
   }
 
-  return favAggregation;
+  return [
+    {
+      $lookup: {
+        from: 'users',
+        pipeline: [
+          {
+            $match: {
+              _id: new Types.ObjectId(userId),
+            },
+          },
+          { $project: { favorites: 1 } },
+        ],
+        as: 'currentUserLookup',
+      },
+    },
+    {
+      $addFields: {
+        currentUser: { $arrayElemAt: ['$currentUserLookup', 0] },
+      },
+    },
+    {
+      $addFields: {
+        isFavorite: { $in: ['$_id', '$currentUser.favorites'] },
+      },
+    },
+    { $unset: 'currentUserLookup' },
+    { $unset: 'currentUser' },
+  ];
 }
 
 export const generalOfferAggregation = [

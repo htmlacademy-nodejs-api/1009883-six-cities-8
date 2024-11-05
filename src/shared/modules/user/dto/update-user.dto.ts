@@ -1,6 +1,6 @@
 import { UserType } from '../../../types/entities/index.js';
 
-export class updateUserDto {
+export class UpdateUserDto {
   public name?: string;
   public avatarPath?: string;
   public type?: UserType;
