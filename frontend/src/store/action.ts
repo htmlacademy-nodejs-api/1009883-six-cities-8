@@ -15,6 +15,8 @@ import { Token } from '../utils';
 import { adaptRegisterToServer } from '../adapters/adaptersToServer';
 import { LoggedUserDto } from '../dto/user/logged-user.dto';
 import { UserDto } from '../dto/user/user.dto';
+import { OfferDto } from '../dto/offer/offer.dto';
+import { adaptOffersToClient } from '../adapters/adaptersToClient';
 
 type Extra = {
   api: AxiosInstance;
@@ -45,9 +47,9 @@ export const fetchOffers = createAsyncThunk<
   { extra: Extra }
 >(Action.FETCH_OFFERS, async (_, { extra }) => {
   const { api } = extra;
-  const { data } = await api.get<Offer[]>(ApiRoute.Offers);
+  const { data } = await api.get<OfferDto[]>(ApiRoute.Offers);
 
-  return data;
+  return adaptOffersToClient(data);
 });
 
 export const fetchFavoriteOffers = createAsyncThunk<
