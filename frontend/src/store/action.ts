@@ -12,11 +12,17 @@ import type {
 } from '../types/types';
 import { ApiRoute, AppRoute, HttpCode } from '../const';
 import { Token } from '../utils';
-import { adaptRegisterToServer } from '../adapters/adaptersToServer';
+import {
+  adaptCreateOfferToServer,
+  adaptRegisterToServer,
+} from '../adapters/adaptersToServer';
 import { LoggedUserDto } from '../dto/user/logged-user.dto';
 import { UserDto } from '../dto/user/user.dto';
 import { OfferDto } from '../dto/offer/offer.dto';
-import { adaptOffersToClient } from '../adapters/adaptersToClient';
+import {
+  adaptOffersToClient,
+  adaptOfferToClient,
+} from '../adapters/adaptersToClient';
 
 type Extra = {
   api: AxiosInstance;
@@ -89,10 +95,13 @@ export const postOffer = createAsyncThunk<Offer, NewOffer, { extra: Extra }>(
   Action.POST_OFFER,
   async (newOffer, { extra }) => {
     const { api, history } = extra;
-    const { data } = await api.post<Offer>(ApiRoute.Offers, newOffer);
+    const { data } = await api.post<OfferDto>(
+      ApiRoute.Offers,
+      adaptCreateOfferToServer(newOffer),
+    );
     history.push(`${AppRoute.Property}/${data.id}`);
 
-    return data;
+    return adaptOfferToClient(data);
   },
 );
 
