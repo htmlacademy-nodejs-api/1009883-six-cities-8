@@ -1,5 +1,5 @@
 export class CreateUserDto {
-  public emai!: string;
+  public email!: string;
 
   public name!: string;
 
