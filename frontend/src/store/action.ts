@@ -13,6 +13,7 @@ import type {
 import { ApiRoute, AppRoute, HttpCode } from '../const';
 import { Token } from '../utils';
 import {
+  adaptCreateCommentToServer,
   adaptCreateOfferToServer,
   adaptRegisterToServer,
 } from '../adapters/adaptersToServer';
@@ -20,9 +21,12 @@ import { LoggedUserDto } from '../dto/user/logged-user.dto';
 import { UserDto } from '../dto/user/user.dto';
 import { OfferDto } from '../dto/offer/offer.dto';
 import {
+  adaptCommentsToClient,
+  adaptCommentToClient,
   adaptOffersToClient,
   adaptOfferToClient,
 } from '../adapters/adaptersToClient';
+import { CommentDto } from '../dto/comment/comment.dto';
 
 type Extra = {
   api: AxiosInstance;
@@ -77,9 +81,9 @@ export const fetchOffer = createAsyncThunk<
   const { api, history } = extra;
 
   try {
-    const { data } = await api.get<Offer>(`${ApiRoute.Offers}/${id}`);
+    const { data } = await api.get<OfferDto>(`${ApiRoute.Offers}/${id}`);
 
-    return data;
+    return adaptOfferToClient(data);
   } catch (error) {
     const axiosError = error as AxiosError;
 
@@ -147,11 +151,9 @@ export const fetchComments = createAsyncThunk<
   { extra: Extra }
 >(Action.FETCH_COMMENTS, async (id, { extra }) => {
   const { api } = extra;
-  const { data } = await api.get<Comment[]>(
-    `${ApiRoute.Offers}/${id}${ApiRoute.Comments}`,
-  );
+  const { data } = await api.get<CommentDto[]>(`${ApiRoute.Comments}/${id}`);
 
-  return data;
+  return adaptCommentsToClient(data);
 });
 
 export const fetchUserStatus = createAsyncThunk<
@@ -248,12 +250,16 @@ export const postComment = createAsyncThunk<
   { extra: Extra }
 >(Action.POST_COMMENT, async ({ id, comment, rating }, { extra }) => {
   const { api } = extra;
-  const { data } = await api.post<Comment>(
-    `${ApiRoute.Offers}/${id}${ApiRoute.Comments}`,
-    { comment, rating },
+  const { data } = await api.post<CommentDto>(
+    `${ApiRoute.Comments}/${id}`,
+    adaptCreateCommentToServer({
+      id: '',
+      comment,
+      rating,
+    }),
   );
 
-  return data;
+  return adaptCommentToClient(data);
 });
 
 export const postFavorite = createAsyncThunk<

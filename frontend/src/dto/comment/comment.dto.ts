@@ -7,5 +7,5 @@ export class CommentDto {
 
   author!: UserDto;
 
-  createdAt?: Date;
+  createdAt!: string;
 }

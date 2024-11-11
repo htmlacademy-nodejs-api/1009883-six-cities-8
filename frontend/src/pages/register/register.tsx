@@ -1,5 +1,5 @@
-import type { FormEvent, MouseEvent, ChangeEvent } from 'react';
-import { useState } from 'react';
+import type { FormEvent, MouseEvent /*ChangeEvent*/ } from 'react';
+// import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import type { CityName, UserRegister } from '../../types/types';
@@ -11,14 +11,14 @@ import { setCity } from '../../store/site-process/site-process';
 
 const Register = (): JSX.Element => {
   const dispatch = useAppDispatch();
-  const [avatar, setAvatar] = useState<File | undefined>();
+  // const [avatar, setAvatar] = useState<File | undefined>();
 
-  const handleAvatarUpload = (evt: ChangeEvent<HTMLInputElement>) => {
-    if (!evt.target.files) {
-      return;
-    }
-    setAvatar(evt.target.files[0]);
-  };
+  // const handleAvatarUpload = (evt: ChangeEvent<HTMLInputElement>) => {
+  //   if (!evt.target.files) {
+  //     return;
+  //   }
+  //   setAvatar(evt.target.files[0]);
+  // };
 
   const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -42,7 +42,12 @@ const Register = (): JSX.Element => {
       <div className="page__login-container container">
         <section className="login">
           <h1 className="login__title">Sign up</h1>
-          <form className="login__form form register-form" action="#" method="post" onSubmit={handleFormSubmit}>
+          <form
+            className="login__form form register-form"
+            action="#"
+            method="post"
+            onSubmit={handleFormSubmit}
+          >
             <div className="login__input-wrapper form__input-wrapper">
               <label className="visually-hidden">Name</label>
               <input
@@ -77,7 +82,7 @@ const Register = (): JSX.Element => {
                 maxLength={12}
               />
             </div>
-            <div
+            {/*<div
               className="login__input-wrapper form__input-wrapper register-form__avatar-wrapper"
             >
               <input
@@ -99,28 +104,25 @@ const Register = (): JSX.Element => {
                   'Upload avatar'
                 )}
               </label>
-            </div>
+            </div>*/}
             <div className="register-form__is-pro-wrapper">
-              <input
-                type="checkbox"
-                name="isPro"
-                id="isPro"
-              />
+              <input type="checkbox" name="isPro" id="isPro" />
               <label htmlFor="isPro" className="register-form__is-pro-label">
-          Create pro account
+                Create pro account
               </label>
             </div>
-            <button
-              className="login__submit form__submit button"
-              type="submit"
-            >
-                Sign up
+            <button className="login__submit form__submit button" type="submit">
+              Sign up
             </button>
           </form>
         </section>
         <section className="locations locations--login locations--current">
           <div className="locations__item">
-            <Link className="locations__item-link" onClick={handleLinkClick} to={AppRoute.Root}>
+            <Link
+              className="locations__item-link"
+              onClick={handleLinkClick}
+              to={AppRoute.Root}
+            >
               <span>{getRandomElement<CityName>(CITIES)}</span>
             </Link>
           </div>

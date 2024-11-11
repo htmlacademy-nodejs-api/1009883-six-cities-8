@@ -1,6 +1,7 @@
+import { CreateCommentDto } from '../dto/comment/create-comment.dto';
 import { CreateOfferDto } from '../dto/offer/create-offer.dto';
 import { CreateUserDto } from '../dto/user/create-user.dto';
-import { NewOffer, UserRegister } from '../types/types';
+import { CommentAuth, NewOffer, UserRegister } from '../types/types';
 
 const housingTypesToServerMap = {
   apartment: 'Apartment',
@@ -30,4 +31,11 @@ export const adaptCreateOfferToServer = (offer: NewOffer): CreateOfferDto => ({
   facilities: offer.goods,
   latitude: offer.location.latitude,
   longitude: offer.location.longitude,
+});
+
+export const adaptCreateCommentToServer = (
+  comment: CommentAuth,
+): CreateCommentDto => ({
+  text: comment.comment,
+  rating: comment.rating,
 });
